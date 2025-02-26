@@ -26,7 +26,11 @@ using glm::mat4;
 
 // SceneBasic_Uniform::SceneBasic_Uniform() : angle(0.0f) {}
 // provided in lab 2
-SceneBasic_Uniform::SceneBasic_Uniform() : torus(0.7f, 0.3f, 30, 30) {}
+// SceneBasic_Uniform::SceneBasic_Uniform() : torus(0.7f, 0.3f, 30, 30) {}
+
+// updated for phong model
+//                                                           30, 30 // the no. of sides and no. of rings
+SceneBasic_Uniform::SceneBasic_Uniform() : torus(0.7f, 0.3f, 50, 50) {}
 
 // lab 2
 
@@ -166,7 +170,7 @@ void SceneBasic_Uniform::initScene()
 
     // to make the model itself rotate, along y-axis
     //                                                       z,    y, x(?)
-    model = glm::rotate(model, glm::radians(-35.0f), vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(15.0f), vec3(0.0f, 1.0f, 0.0f));
 
     // init view matrix
     view = glm::lookAt(vec3(0.0f, 0.0f, 2.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
@@ -175,15 +179,39 @@ void SceneBasic_Uniform::initScene()
     projection = mat4(1.0f);
 
     // the diffuse material settled
-    prog.setUniform("Kd", vec3(0.2f, 0.55f, 0.9f));
+    // prog.setUniform("Kd", vec3(0.2f, 0.55f, 0.9f));
+    prog.setUniform("Material.Kd", vec3(0.2f, 0.55f, 0.9f));                       // extended to a class in the vertex shader
 
     // the diffuse light (how bright it is?) settled
-    prog.setUniform("Ld", vec3(1.0f, 1.0f, 1.0f));
+    // prog.setUniform("Ld", vec3(1.0f, 1.0f, 1.0f));
+    prog.setUniform("Light.Ld", vec3(1.0f, 1.0f, 1.0f));                           // extended to a class in the vertex shader
 
     // the position of the light in the scene settled
-    prog.setUniform("LightPosition", view* glm::vec4(5.0f, 5.0f, 2.0f, 1.0f));
+    // prog.setUniform("LightPosition", view* glm::vec4(5.0f, 5.0f, 2.0f, 1.0f));
+    prog.setUniform("Light.Position", view* glm::vec4(5.0f, 5.0f, 2.0f, 1.0f));    // extended to a class in the vertex shader
 
     // lab 2 - diffuse
+    
+    
+    
+    // lab 2 - phong model
+
+    // the ambient material settled
+    prog.setUniform("Material.Ka", vec3(0.2f, 0.55f, 0.9f));
+
+    // the ambient light (how bright it is?) settled
+    prog.setUniform("Light.La", vec3(0.4f, 0.4f, 0.4f));
+
+    // the specular material settled
+    prog.setUniform("Material.Ks", vec3(0.8f, 0.8f, 0.8f));
+
+    // the specular light (how bright it is?) settled
+    prog.setUniform("Light.Ls", vec3(1.0f, 1.0f, 1.0f));
+
+    // the shininess of the specular lighting settled
+    prog.setUniform("Material.shininess", 100.0f);
+
+    // lab 2 - phong model
 
 }
 
