@@ -50,9 +50,9 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{367AD74B-F4F7-4EAE-85FA-F5051D242CD2}</ProjectGuid>
-    <RootNamespace>Lab 2 - Phong Model</RootNamespace>
+    <RootNamespace>Lab 2.2 - Phong Model</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Lab 2 - Phong Model</ProjectName>
+    <ProjectName>Lab 2.2 - Phong Model</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

@@ -49,10 +49,10 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{A2BF5BBF-B40D-4FCE-8BB5-EC07A6D75012}</ProjectGuid>
-    <RootNamespace>Lab 2.1 - Diffuse</RootNamespace>
+    <ProjectGuid>{32A60563-4429-47E9-AC87-1CEC28963375}</ProjectGuid>
+    <RootNamespace>Lab 2.3 - Flat Shading</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Lab 2.1 - Diffuse</ProjectName>
+    <ProjectName>Lab 2.3 - Flat Shading</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

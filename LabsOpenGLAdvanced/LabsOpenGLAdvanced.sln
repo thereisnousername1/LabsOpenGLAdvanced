@@ -7,9 +7,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 0 - Initialization", "L
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 1 - Spinning triangle", "Lab 1\Project_Template.vcxproj", "{2424A6AC-480B-441A-94EA-86C5C10C6ABF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 2 - Diffuse", "Lab 2\Lab 2.vcxproj", "{A2BF5BBF-B40D-4FCE-8BB5-EC07A6D75012}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 2.1 - Diffuse", "Lab 2\Lab 2.vcxproj", "{A2BF5BBF-B40D-4FCE-8BB5-EC07A6D75012}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 2 - Phong Model", "Lab 2 - phong model\Lab 2 - phong model.vcxproj", "{367AD74B-F4F7-4EAE-85FA-F5051D242CD2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 2.2 - Phong Model", "Lab 2 - phong model\Lab 2 - phong model.vcxproj", "{367AD74B-F4F7-4EAE-85FA-F5051D242CD2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 2.3 - Flat Shading", "Lab 2 - flat shading\Lab 2 - flat shading.vcxproj", "{32A60563-4429-47E9-AC87-1CEC28963375}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,14 @@ Global
 		{367AD74B-F4F7-4EAE-85FA-F5051D242CD2}.Release|x64.Build.0 = Release|x64
 		{367AD74B-F4F7-4EAE-85FA-F5051D242CD2}.Release|x86.ActiveCfg = Release|Win32
 		{367AD74B-F4F7-4EAE-85FA-F5051D242CD2}.Release|x86.Build.0 = Release|Win32
+		{32A60563-4429-47E9-AC87-1CEC28963375}.Debug|x64.ActiveCfg = Debug|x64
+		{32A60563-4429-47E9-AC87-1CEC28963375}.Debug|x64.Build.0 = Debug|x64
+		{32A60563-4429-47E9-AC87-1CEC28963375}.Debug|x86.ActiveCfg = Debug|Win32
+		{32A60563-4429-47E9-AC87-1CEC28963375}.Debug|x86.Build.0 = Debug|Win32
+		{32A60563-4429-47E9-AC87-1CEC28963375}.Release|x64.ActiveCfg = Release|x64
+		{32A60563-4429-47E9-AC87-1CEC28963375}.Release|x64.Build.0 = Release|x64
+		{32A60563-4429-47E9-AC87-1CEC28963375}.Release|x86.ActiveCfg = Release|Win32
+		{32A60563-4429-47E9-AC87-1CEC28963375}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
