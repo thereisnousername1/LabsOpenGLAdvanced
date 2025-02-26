@@ -143,7 +143,7 @@ private:
 			
             // if an input() method is created somewhere, it should not be called in here, instead call it in update() method
             scene.update(float(glfwGetTime()));
-            // gezz it is always 800 and 600, what is the point?
+            // geez it is always 800 and 600, what is the point?
             // std::cout << "Update : " << fbw << " , " << fbh << std::endl;
             scene.render();
             glfwSwapBuffers(window);

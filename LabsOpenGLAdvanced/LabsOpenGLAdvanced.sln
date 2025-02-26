@@ -5,7 +5,7 @@ VisualStudioVersion = 17.14.35806.103
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 0 - Initialization", "LabsOpenGLAdvanced.vcxproj", "{309B0C61-20C0-41AF-A015-F82A42320569}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 1", "Lab 1\Project_Template.vcxproj", "{2424A6AC-480B-441A-94EA-86C5C10C6ABF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 1 - Spinning triangle", "Lab 1\Project_Template.vcxproj", "{2424A6AC-480B-441A-94EA-86C5C10C6ABF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
