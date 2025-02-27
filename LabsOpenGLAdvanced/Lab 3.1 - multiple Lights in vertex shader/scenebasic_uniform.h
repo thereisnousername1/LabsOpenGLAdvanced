@@ -34,7 +34,7 @@ private:
 
     // lab 2
 
-    float angle;
+    // float angle;
 
     // lab 2
 

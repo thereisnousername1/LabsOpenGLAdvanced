@@ -20,7 +20,7 @@ flat out vec3 LightIntensity;
 
 // lab 1
 
-// uniform mat4 RotationMatrix; // useless since lab 2
+uniform mat4 RotationMatrix; // useless since lab 2
 
 // lab 1
 
@@ -156,7 +156,8 @@ void main()
     // lab 1
     // gl_Position = vec4(VertexPosition,1.0);  // disabled from lab 1
     // gl_Position = vec4(VertexPosition,1.0) * RotationMatrix; // diabled from lab 2
-    gl_Position = MVP * vec4(VertexPosition,1.0);
+    // gl_Position = MVP * vec4(VertexPosition,1.0);
+    gl_Position = MVP * vec4(VertexPosition,1.0) * RotationMatrix;
 
     
 }

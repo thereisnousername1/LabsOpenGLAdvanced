@@ -1,4 +1,3 @@
-//// THIS VERSION OF FLAT SHADING HAS ROTATION MECHANIC ENABLED, BECAUSE THE ORIGINAL LAB IS TOO SIMPLE
 #include "scenebasic_uniform.h"
 
 #include <cstdio>
@@ -6,6 +5,12 @@
 
 #include <string>
 using std::string;
+
+// lab 3.1
+
+#include <sstream>
+
+// lab 3.1
 
 #include <iostream>
 using std::cerr;
@@ -31,8 +36,7 @@ using glm::mat4;
 
 // updated for phong model
 //                                                           30, 30 // the no. of sides and no. of rings
-// SceneBasic_Uniform::SceneBasic_Uniform() : torus(0.7f, 0.3f, 50, 50) {}
-SceneBasic_Uniform::SceneBasic_Uniform() : angle(0.0f), torus(0.7f, 0.3f, 50, 50) {}
+SceneBasic_Uniform::SceneBasic_Uniform() : torus(0.7f, 0.3f, 50, 50) {}
 
 // lab 2
 
@@ -168,11 +172,11 @@ void SceneBasic_Uniform::initScene()
 
     // to make the model itself rotate, along z-axis
     //                                                       z,    y, x(?)
-    model = glm::rotate(model, glm::radians(-35.0f), vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(-45.0f), vec3(1.0f, 0.0f, 0.0f));
 
     // to make the model itself rotate, along y-axis
     //                                                       z,    y, x(?)
-    model = glm::rotate(model, glm::radians(15.0f), vec3(0.0f, 1.0f, 0.0f));
+    // model = glm::rotate(model, glm::radians(0.0f), vec3(0.0f, 1.0f, 0.0f));
 
     // init view matrix
     view = glm::lookAt(vec3(0.0f, 0.0f, 2.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
@@ -180,40 +184,53 @@ void SceneBasic_Uniform::initScene()
     // init projection matrix
     projection = mat4(1.0f);
 
-    // the diffuse material settled
-    // prog.setUniform("Kd", vec3(0.2f, 0.55f, 0.9f));
-    prog.setUniform("Material.Kd", vec3(0.2f, 0.55f, 0.9f));                       // extended to a class in the vertex shader
-
+    #pragma region lab 3.1 - the data of all lights intensity are adjusted since multiple light is added to replace what is in lab 2
+    
+    // Material parts are moved to render()
+    // by disable all of the diffuse intensity, 3 lights with different color settings could be observe more obviously
+    
     // the diffuse light (how bright it is?) settled
     // prog.setUniform("Ld", vec3(1.0f, 1.0f, 1.0f));
-    prog.setUniform("Light.Ld", vec3(1.0f, 1.0f, 1.0f));                           // extended to a class in the vertex shader
+    // prog.setUniform("Light.Ld", vec3(1.0f, 1.0f, 1.0f));
+    prog.setUniform("lights[0].Ld", vec3(0.0f, 0.0f, 0.8f));                           // extended to a class in the vertex shader
+    prog.setUniform("lights[1].Ld", vec3(0.0f, 0.8f, 0.0f));
+    prog.setUniform("lights[2].Ld", vec3(0.8f, 0.0f, 0.0f));
 
     // the position of the light in the scene settled
     // prog.setUniform("LightPosition", view* glm::vec4(5.0f, 5.0f, 2.0f, 1.0f));
-    prog.setUniform("Light.Position", view* glm::vec4(5.0f, 5.0f, 2.0f, 1.0f));    // extended to a class in the vertex shader
+    // prog.setUniform("Light.Position", view* glm::vec4(5.0f, 5.0f, 2.0f, 1.0f));     // extended to a class in the vertex shader
 
-    // lab 2 - diffuse
-    
-    
-    
-    // lab 2 - phong model
+    #pragma region multiple lights position setting (method to adjust variables in vertex shader)
 
-    // the ambient material settled
-    prog.setUniform("Material.Ka", vec3(0.2f, 0.55f, 0.9f));
+    float x, z; // y-axis (height) remains the same
+
+    // for all of the lights
+    for (int i = 0; i < 3; i++)
+    {
+        std::stringstream name;
+        name << "lights[" << i << "].Position";
+        x = 2.0f * cosf((glm::two_pi<float>() / 3) * i);
+        z = 2.0f * sinf((glm::two_pi<float>() / 3) * i);
+
+        // set the x and z for the position of each of the lights
+        prog.setUniform(name.str().c_str(), view * glm::vec4(x, 1.2f, z + 1.0f, 1.0f));
+    }
+
+    #pragma endregion
 
     // the ambient light (how bright it is?) settled
-    prog.setUniform("Light.La", vec3(0.4f, 0.4f, 0.4f));
-
-    // the specular material settled
-    prog.setUniform("Material.Ks", vec3(0.8f, 0.8f, 0.8f));
+    // prog.setUniform("Light.La", vec3(0.4f, 0.4f, 0.4f));
+    prog.setUniform("lights[0].La", vec3(0.0f, 0.0f, 0.2f));
+    prog.setUniform("lights[1].La", vec3(0.0f, 0.2f, 0.0f));
+    prog.setUniform("lights[2].La", vec3(0.2f, 0.0f, 0.0f));
 
     // the specular light (how bright it is?) settled
-    prog.setUniform("Light.Ls", vec3(1.0f, 1.0f, 1.0f));
+    // prog.setUniform("Light.Ls", vec3(1.0f, 1.0f, 1.0f));
+    prog.setUniform("lights[0].Ls", vec3(0.0f, 0.0f, 0.8f));
+    prog.setUniform("lights[1].Ls", vec3(0.0f, 0.8f, 0.0f));
+    prog.setUniform("lights[2].Ls", vec3(0.8f, 0.0f, 0.0f));
 
-    // the shininess of the specular lighting settled
-    prog.setUniform("Material.shininess", 100.0f);
-
-    // lab 2 - phong model
+    #pragma endregion
 
 }
 
@@ -236,7 +253,7 @@ void SceneBasic_Uniform::compile()
 void SceneBasic_Uniform::update( float t )
 {
     #pragma region Disabled in lab 2
-    
+    /*
 	//update your angle here
 
     // lab 1
@@ -252,7 +269,7 @@ void SceneBasic_Uniform::update( float t )
     }
 
     // lab 1
-    
+    */
     #pragma endregion
 }
 
@@ -287,21 +304,26 @@ void SceneBasic_Uniform::render()
     */
     #pragma endregion
 
-    // lab 2
+    // lab 3.1
     
+    // the diffuse material settled
+    // prog.setUniform("Kd", vec3(0.2f, 0.55f, 0.9f));
+    prog.setUniform("Material.Kd", vec3(0.2f, 0.55f, 0.9f));                       // extended to a class in the vertex shader
+
+    // the ambient material settled
+    prog.setUniform("Material.Ka", vec3(0.2f, 0.55f, 0.9f));
+
+    // the specular material settled
+    prog.setUniform("Material.Ks", vec3(0.8f, 0.8f, 0.8f));
+
+    // the shininess of the specular lighting settled
+    prog.setUniform("Material.shininess", 100.0f);
+
     setMatrices();
-
-    rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, vec3(0.0f, 0.0f, 1.0f));
-
-    GLuint programHandle = prog.getHandle();
-
-    GLuint location = glGetUniformLocation(programHandle, "RotationMatrix");
-
-    glUniformMatrix4fv(location, 1, GL_FALSE, &rotationMatrix[0][0]);
 
     torus.render();
     
-    // lab 2
+    // lab 3.1
 
 }
 
