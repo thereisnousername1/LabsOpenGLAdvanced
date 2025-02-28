@@ -1,5 +1,6 @@
 //// Reference to OpenGL SuperBible (7th edition) p.574 ////
 //// This example shows Per-fragment lighting (Phong shading) ////
+//// Also Blinn-Phong shading (edit in fragment shader) ////
 
 ///
 /// Pre-requisites :

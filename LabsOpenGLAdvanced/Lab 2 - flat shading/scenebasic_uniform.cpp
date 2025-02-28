@@ -291,13 +291,21 @@ void SceneBasic_Uniform::render()
     
     setMatrices();
 
+
+
+    //////////////////// method 1 to set a mat4 RotationMatrix ////////////////////
     rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, vec3(0.0f, 0.0f, 1.0f));
 
     GLuint programHandle = prog.getHandle();
 
     GLuint location = glGetUniformLocation(programHandle, "RotationMatrix");
 
-    glUniformMatrix4fv(location, 1, GL_FALSE, &rotationMatrix[0][0]);
+    glUniformMatrix4fv(location, 1, GL_FALSE, &rotationMatrix[0][0]);   // either enable this line
+
+
+
+    //////////////////// method 2 to set a mat4 RotationMatrix ////////////////////
+    // prog.setUniform("RotationMatrix", glm::rotate(glm::mat4(1.0f), angle, vec3(0.0f, 0.0f, 1.0f)));  // or enable this line
 
     torus.render();
     

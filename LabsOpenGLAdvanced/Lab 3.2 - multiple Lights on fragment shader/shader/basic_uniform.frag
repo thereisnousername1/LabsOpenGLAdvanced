@@ -102,12 +102,16 @@ vec3 phongModel (int light, vec3 position, vec3 n)
         // vec3 v = normalize(-pos.xyz);
         vec3 v = normalize(-position.xyz);
 
-        // reflection
+        // reflection -> Phong Shading
         vec3 r = reflect(-s, n);
+
+        // calculate the half vector -> Blinn-Phong Shading
+        // vec3 h = normalize(s + v);
 
         //  final spec                           eye reflection angle
         // specular = Light.Ls * Material.Ks * pow(max(dot(r, v), 0.0), Material.shininess);
-        specular = lights[light].Ls * Material.Ks * pow(max(dot(r, v), 0.0), Material.shininess);
+        specular = lights[light].Ls * Material.Ks * pow(max(dot(r, v), 0.0), Material.shininess);   // reflection -> Phong Shading
+        // specular = lights[light].Ls * Material.Ks * pow(max(dot(n, h), 0.0), Material.shininess);   // calculate the half vector -> Blinn-Phong Shading
     
         //// In the lab pdf, diffuse intensity and specular intensity is combined
         //// they are meant to be multiply in the final output
