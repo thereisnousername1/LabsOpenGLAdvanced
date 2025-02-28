@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 {
 	// initialization of the glfw, glad is done in SceneRunner
 	// in another word, SceneRunner is the window itself in this case
-	SceneRunner runner("Lab 3.1 - Per-vertex lighting (Gouraud shading), Multiple Lights in Vertex Shader");	// Title of the program
+	SceneRunner runner("Lab 3.2 - Per-fragment lighting (Phong shading), Multiple Lights on Fragment Shader");	// Title of the program
 
 	std::unique_ptr<Scene> scene;
 

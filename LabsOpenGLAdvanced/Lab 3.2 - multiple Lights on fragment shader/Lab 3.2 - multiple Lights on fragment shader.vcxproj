@@ -49,10 +49,10 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{EBF49745-BB07-43BB-8F78-D5416E582181}</ProjectGuid>
-    <RootNamespace>Lab 3.1 - Per-vertex lighting (Gouraud shading), Multiple Lights in Vertex Shader</RootNamespace>
+    <ProjectGuid>{F19CEBCE-323D-4889-B914-848E3C0C0344}</ProjectGuid>
+    <RootNamespace>Lab 3.2 - Per-fragment lighting (Phong shading), Multiple Lights on Fragment Shader</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Lab 3.1 - Per-vertex lighting (Gouraud shading), Multiple Lights in Vertex Shader</ProjectName>
+    <ProjectName>Lab 3.2 - Per-fragment lighting (Phong shading), Multiple Lights on Fragment Shader</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

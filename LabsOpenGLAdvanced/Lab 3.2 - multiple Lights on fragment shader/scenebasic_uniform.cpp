@@ -1,5 +1,20 @@
-//// Reference to OpenGL SuperBible (7th edition) p.573 ////
-//// This example shows Per-vertex lighting (Gouraud shading) ////
+//// Reference to OpenGL SuperBible (7th edition) p.574 ////
+//// This example shows Per-fragment lighting (Phong shading) ////
+
+///
+/// Pre-requisites :
+/// 
+/// lab 3.2 comes from lab 3.1
+/// The purpose of this lab is to introduce another method to do multiple shading
+/// which is done mainly depending on the fragment shader
+/// according to what JJ said in the video
+/// this is for better performance as shading done in the vertex shader is not recommended
+/// moving the most processing to the fragment shader so that
+/// they can interact on the pixels rather than on the vertices
+/// so we can get a more spread out light information on the scene
+/// 
+/// Check vertex shader and fragment shader
+///
 
 #include "scenebasic_uniform.h"
 
@@ -307,7 +322,7 @@ void SceneBasic_Uniform::render()
     */
     #pragma endregion
 
-    // lab 3.1
+    // lab 3.2
     
     // the diffuse material settled
     // prog.setUniform("Kd", vec3(0.2f, 0.55f, 0.9f));
