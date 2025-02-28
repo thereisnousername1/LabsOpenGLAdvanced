@@ -279,14 +279,18 @@ void SceneBasic_Uniform::initScene()
 
     #pragma endregion
 
+    #pragma region lab 3.4 - Spotlight intensity setting
+
     // Spotlight intensity settled
-    // prog.setUniform("Spot.Ld", vec3(0.9f));
-    prog.setUniform("Spot.Ld", vec3(0.09f));    // dreate diversity from other labs
+    prog.setUniform("Spot.Ld", vec3(0.9f));
+    // prog.setUniform("Spot.Ld", vec3(0.09f));    // create diversity from other labs
     prog.setUniform("Spot.Ls", vec3(0.9f));
-    // prog.setUniform("Spot.La", vec3(0.5f));
-    prog.setUniform("Spot.La", vec3(0.3f));
+    prog.setUniform("Spot.La", vec3(0.5f));
+    // prog.setUniform("Spot.La", vec3(0.3f));
     prog.setUniform("Spot.Exponent", 50.0f);
     prog.setUniform("Spot.Cutoff", glm::radians(15.0f));
+
+    #pragma endregion
 
 }
 
@@ -450,8 +454,6 @@ void SceneBasic_Uniform::render()
 
     // lab 3.4
 
-    //////////////////// First model ////////////////////
-    
     //Spotlight position settled (in lab 3.4 there is only one spotlight)
     // vec4 lightPos = vec4(0.0f, 10.0f, 0.0f, 1.0f);  // static position
     vec4 lightPos = vec4(10.0f * cos(angle), 10.0f, 10.0f * sin(angle), 1.0f);  // spinning rotation
@@ -459,6 +461,10 @@ void SceneBasic_Uniform::render()
 
     mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
     prog.setUniform("Spot.Direction", normalMatrix * vec3(-lightPos));
+
+
+
+    //////////////////// First model ////////////////////
 
     // the diffuse material settled
     prog.setUniform("Material.Kd", vec3(0.2f, 0.55f, 0.9f));

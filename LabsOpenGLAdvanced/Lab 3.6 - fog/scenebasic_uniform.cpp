@@ -63,8 +63,8 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
 
     tPrev(0),   // added in lab 3.4, for sinning logic
     plane(50.0f, 50.0f, 1, 1),
-    teapot(14, glm::mat4(1.0f)),
-    torus(1.75f * 0.75f, 1.75f * 0.75f, 50, 50)
+    teapot(14, glm::mat4(1.0f))
+    // torus(1.75f * 0.75f, 1.75f * 0.75f, 50, 50)  // no longer necessary in lab 3.6
 {
     //                       relative file location in my computer            , bool center (according to the IDE)
     // mesh = ObjMesh::load("../Lab 3.3 - pig mesh/media/pig_triangulated.obj", true);
@@ -215,7 +215,8 @@ void SceneBasic_Uniform::initScene()
     // init view matrix
     // view = glm::lookAt(vec3(0.0f, 0.0f, 2.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f)); // changed in lab 3.3
     // view = glm::lookAt(vec3(0.5f, 0.75f, 0.75f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f)); // changed in lab 3.4
-    view = glm::lookAt(vec3(5.0f, 5.0f, 7.5f), vec3(0.0f, 0.75f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+    // view = glm::lookAt(vec3(5.0f, 5.0f, 7.5f), vec3(0.0f, 0.75f, 0.0f), vec3(0.0f, 1.0f, 0.0f)); // changed in lab 3.6
+    view = glm::lookAt(vec3(0.0f, 4.0f, 6.0f), vec3(0.0f, 0.2f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 
     // init projection matrix
     projection = mat4(1.0f);
@@ -227,26 +228,26 @@ void SceneBasic_Uniform::initScene()
 
     // lab 3.4
 
-    #pragma region (Disabled)lab 3.1 - the data of all lights intensity are adjusted since multiple light is added to replace what is in lab 2
-    
-    /* Disabled since lab 3.4
+    #pragma region lab 3.6 <- 3.1 - Directional Light / lights(for multiple lights scenario)
     
     // Material parts are moved to render()
     // by disable all of the diffuse intensity, 3 lights with different color settings could be observe more obviously
     
     // the diffuse light (how bright it is?) settled
     // prog.setUniform("Ld", vec3(1.0f, 1.0f, 1.0f));
-    // prog.setUniform("Light.Ld", vec3(1.0f, 1.0f, 1.0f));
-    prog.setUniform("lights[0].Ld", vec3(0.0f, 0.0f, 0.8f));                           // extended to a class in the vertex shader
-    prog.setUniform("lights[1].Ld", vec3(0.0f, 0.8f, 0.0f));
-    prog.setUniform("lights[2].Ld", vec3(0.8f, 0.0f, 0.0f));
+    // prog.setUniform("Light.Ld", vec3(1.0f, 1.0f, 1.0f)); // modified in lab 3.6
+    prog.setUniform("Light.Ld", vec3(0.9f));
+    // prog.setUniform("lights[0].Ld", vec3(0.0f, 0.0f, 0.8f));                           // extended to a class in the vertex shader
+    // prog.setUniform("lights[1].Ld", vec3(0.0f, 0.8f, 0.0f));
+    // prog.setUniform("lights[2].Ld", vec3(0.8f, 0.0f, 0.0f));
 
     // the position of the light in the scene settled
     // prog.setUniform("LightPosition", view* glm::vec4(5.0f, 5.0f, 2.0f, 1.0f));
-    // prog.setUniform("Light.Position", view* glm::vec4(5.0f, 5.0f, 2.0f, 1.0f));     // extended to a class in the vertex shader
+    // prog.setUniform("Light.Position", view* glm::vec4(5.0f, 5.0f, 2.0f, 1.0f));     // duplicated setting, moved to render() instead
 
-    #pragma region multiple lights position setting (method to adjust variables in vertex shader)
+    #pragma region (Disabled)multiple lights position setting (method to adjust variables in vertex shader)
 
+    /* disabled since lab 3.6
     float x, z; // y-axis (height) remains the same
 
     // for all of the lights
@@ -260,33 +261,54 @@ void SceneBasic_Uniform::initScene()
         // set the x and z for the position of each of the lights
         prog.setUniform(name.str().c_str(), view * glm::vec4(x, 1.2f, z + 1.0f, 1.0f));
     }
-
-    #pragma endregion
-
-    // the ambient light (how bright it is?) settled
-    // prog.setUniform("Light.La", vec3(0.4f, 0.4f, 0.4f));
-    prog.setUniform("lights[0].La", vec3(0.0f, 0.0f, 0.2f));
-    prog.setUniform("lights[1].La", vec3(0.0f, 0.2f, 0.0f));
-    prog.setUniform("lights[2].La", vec3(0.2f, 0.0f, 0.0f));
-
-    // the specular light (how bright it is?) settled
-    // prog.setUniform("Light.Ls", vec3(1.0f, 1.0f, 1.0f));
-    prog.setUniform("lights[0].Ls", vec3(0.0f, 0.0f, 0.8f));
-    prog.setUniform("lights[1].Ls", vec3(0.0f, 0.8f, 0.0f));
-    prog.setUniform("lights[2].Ls", vec3(0.8f, 0.0f, 0.0f));
-
     */
 
     #pragma endregion
 
-    #pragma region lab 3.4 - Spotlight intensity setting
+    // the ambient light (how bright it is?) settled
+    // prog.setUniform("Light.La", vec3(0.4f, 0.4f, 0.4f)); // modified in lab 3.6
+    prog.setUniform("Light.La", vec3(0.5f));
+    // prog.setUniform("lights[0].La", vec3(0.0f, 0.0f, 0.2f));
+    // prog.setUniform("lights[1].La", vec3(0.0f, 0.2f, 0.0f));
+    // prog.setUniform("lights[2].La", vec3(0.2f, 0.0f, 0.0f));
+
+    // the specular light (how bright it is?) settled
+    // prog.setUniform("Light.Ls", vec3(1.0f, 1.0f, 1.0f)); // modified in lab 3.6
+    prog.setUniform("Light.Ls", vec3(0.9f));
+    // prog.setUniform("lights[0].Ls", vec3(0.0f, 0.0f, 0.8f));
+    // prog.setUniform("lights[1].Ls", vec3(0.0f, 0.8f, 0.0f));
+    // prog.setUniform("lights[2].Ls", vec3(0.8f, 0.0f, 0.0f));
+
+    #pragma endregion
+
+    #pragma region lab 3.6 Fog Setting (lab 3.6 main feature)
+    
+    // reference to OpenGL SuperBible p.606 - 609
+
+    // Lower the number, less further the fog can spread (relatively to the camera position), vice versa
+    prog.setUniform("Fog.MaxDist", 30.0f);
+
+    // Larger the number, more further the fog begin to spread (relatively to the camera position), vice versa
+    prog.setUniform("Fog.MinDist", 1.0f);
+
+    prog.setUniform("Fog.Color", vec3(0.5f, 0.5f, 0.5f));
+
+    #pragma endregion
+
+    #pragma region (Disabled)lab 3.4 - Spotlight intensity setting->return to directional light
+
+    /* Disabled since lab 3.6
     
     // Spotlight intensity settled
     prog.setUniform("Spot.Ld", vec3(0.9f));
+    // prog.setUniform("Spot.Ld", vec3(0.09f));    // create diversity from other labs
     prog.setUniform("Spot.Ls", vec3(0.9f));
     prog.setUniform("Spot.La", vec3(0.5f));
+    // prog.setUniform("Spot.La", vec3(0.3f));
     prog.setUniform("Spot.Exponent", 50.0f);
     prog.setUniform("Spot.Cutoff", glm::radians(15.0f));
+
+    */
 
     #pragma endregion
 
@@ -335,7 +357,8 @@ void SceneBasic_Uniform::update( float t )
     float deltaT = t - tPrev;
     if (tPrev == 0.0f) deltaT = 0.0f;
     tPrev = t;
-    angle += 0.25f * deltaT;
+    // angle += 0.25f * deltaT;    // modified since lab 3.6
+    angle += 0.1f * deltaT;
     if (angle > glm::two_pi<float>()) angle -= glm::two_pi<float>();
 
     // lab 3.4
@@ -450,19 +473,22 @@ void SceneBasic_Uniform::render()
     */
     #pragma endregion
 
-    // lab 3.4
+    // lab 3.6
 
-    //Spotlight position settled (in lab 3.4 there is only one spotlight)
+    // since lab 3.6 return to single directional light
     // vec4 lightPos = vec4(0.0f, 10.0f, 0.0f, 1.0f);  // static position
     vec4 lightPos = vec4(10.0f * cos(angle), 10.0f, 10.0f * sin(angle), 1.0f);  // spinning rotation
-    prog.setUniform("Spot.Position", vec3(view * lightPos));
+    // prog.setUniform("Spot.Position", vec3(view * lightPos));
+    prog.setUniform("Light.Position", vec4(view * lightPos));   // convert to vec4 instead of vec3 to match the type
 
-    mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
-    prog.setUniform("Spot.Direction", normalMatrix * vec3(-lightPos));
+    // mat3 normalMatrix = mat3(vec3(view[0]), vec3(view[1]), vec3(view[2]));
+    // prog.setUniform("Spot.Direction", normalMatrix * vec3(-lightPos));   // disabled since lab 3.6
+
+    #pragma region Multiple imported model setting section (Will be modified in numerous labs)
 
 
 
-    //////////////////// First model ////////////////////
+    //////////////////// First model(s) ////////////////////
 
     // the diffuse material settled
     prog.setUniform("Material.Kd", vec3(0.2f, 0.55f, 0.9f));
@@ -473,19 +499,33 @@ void SceneBasic_Uniform::render()
     // the shininess of the specular lighting settled
     prog.setUniform("Material.shininess", 100.0f);
 
-    // modify transform.position in the scene per mesh I guess?
-    model = mat4(1.0f);
-    model = glm::translate(model, vec3(0.0f, 0.0f, -2.0f));
+    // lab 3.6
 
-    //                  obj  , how much degree    ,along    x,  y  , z
-    model = glm::rotate(model, glm::radians(45.0f), vec3(0.0f, 1.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
-    setMatrices();
+    // distance between each teapot
+    float dist = 0.0f;
 
-    // it seems as a std::unique_ptr<ObjMesh> mesh
-    // -> has to be use instead of . notation and so it could be render()
-    // mesh->render();  // disabled since lab 3.4
-    teapot.render();
+    // duplicate 5 teapot and align them in a line
+    for (int i = 0; i < 5; i++)
+    {
+        // modify transform.position in the scene per mesh I guess?
+        model = mat4(1.0f);
+        // model = glm::translate(model, vec3(0.0f, 0.0f, -2.0f));  // modified since lab 3.6
+        model = glm::translate(model, vec3(dist * 0.6f - 1.0f, 0.0f, -dist));
+
+        //                     obj  , how much degree    ,along    x,  y  , z
+        // model = glm::rotate(model, glm::radians(45.0f), vec3(0.0f, 1.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
+        setMatrices();
+
+        // it seems as a std::unique_ptr<ObjMesh> mesh
+        // -> has to be use instead of . notation and so it could be render()
+        // mesh->render();  // disabled since lab 3.4
+        teapot.render();
+
+        dist += 7.0f;
+    }
+
+    // lab 3.6
 
     //////////////////// First model ////////////////////
 
@@ -493,27 +533,8 @@ void SceneBasic_Uniform::render()
 
     //////////////////// Second model ////////////////////
 
-    prog.setUniform("Material.Kd", vec3(0.2f, 0.55f, 0.9f));
-    prog.setUniform("Material.Ks", vec3(0.95f, 0.95f, 0.95f));
-    prog.setUniform("Material.Ka", vec3(0.2f * 0.3f, 0.55f * 0.3f, 0.9f * 0.3f));
-    prog.setUniform("Material.shininess", 100.0f);
-
-    model = mat4(1.0f);
-    model = glm::translate(model, vec3(-1.0f, 0.75f, 3.0f));
-    //                  obj  , how much degree    ,along    x,  y  , z
-    model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
-    setMatrices();
-
-    torus.render();
-
-    //////////////////// Second model ////////////////////
-
-
-
-    //////////////////// Third model ////////////////////
-
     prog.setUniform("Material.Kd", vec3(0.7f, 0.7f, 0.7f));
-    prog.setUniform("Material.Ks", vec3(0.9f, 0.9f, 0.9f));
+    prog.setUniform("Material.Ks", vec3(0.0f, 0.0f, 0.0f));
     prog.setUniform("Material.Ka", vec3(0.2f, 0.2f, 0.2f));
     prog.setUniform("Material.shininess", 180.0f);
 
@@ -522,33 +543,26 @@ void SceneBasic_Uniform::render()
 
     plane.render();
 
-    //////////////////// Third model ////////////////////
+    //////////////////// Second model ////////////////////
+
+    // lab 3.6
+
+    #pragma endregion
 }
 
 void SceneBasic_Uniform::resize(int w, int h)
 {
-    // lab 2
 
     glViewport(0, 0, w, h);
 
-    // lab 2
-
     width = w;
     height = h;
-
-    // lab 2
-
-    // relocated in lab 2
-    // glViewport(0,0,w,h);
 
     // setting the aspect ratio for the model according to the window size
     // without this line it will not render
     projection = glm::perspective(glm::radians(70.0f), (float)w / h, 0.3f, 100.0f);
 
-    // lab 2
 }
-
-// lab 2
 
 void SceneBasic_Uniform::setMatrices()
 {
@@ -564,5 +578,3 @@ void SceneBasic_Uniform::setMatrices()
     // set uniform for model, view, projection (MVP) and pass in the projection matrix * model view matrix
     prog.setUniform("MVP", projection * mv);
 }
-
-// lab 2

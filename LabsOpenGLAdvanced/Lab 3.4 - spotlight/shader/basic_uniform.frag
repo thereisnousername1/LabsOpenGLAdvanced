@@ -173,7 +173,7 @@ vec3 phongSpotModel (vec3 position, vec3 n)
                                               // a better programming structure manner
 
     // it seems spotlight is directional light with restriction (Spotlight is not specifically mentioned in OpenGL SuperBible)
-    return  ambient + (diffuse + specular) * spotScale;   // lab 3.4 Spotlight logic
+    return ambient + (diffuse + specular) * spotScale;   // lab 3.4 Spotlight logic
 
     //// Originally lights[light].L are meant to be merge here
     //// the code looks like this
@@ -186,7 +186,7 @@ vec3 phongSpotModel (vec3 position, vec3 n)
 
 void main() {
 
-    // lab 3.2
+    /* multiple lights are disabled
 
     vec3 Color = vec3(0.0); // for per-fragment lighting (phong shading), color is handled in fragment shader
 
@@ -203,5 +203,11 @@ void main() {
     FragColor = vec4(Color, 1.0);
     // FragColor = vec4(LightIntensity, 1.0);
 
-    // lab 3.2
+    */
+
+    // lab 3.4
+
+    FragColor = vec4(phongSpotModel(position, normalize(normal)), 1.0);
+
+    // lab 3.4
 }
