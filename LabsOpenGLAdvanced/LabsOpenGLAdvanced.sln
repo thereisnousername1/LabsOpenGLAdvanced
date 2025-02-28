@@ -25,6 +25,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 3.5 - Toon Shading", "L
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 3.6 - Fog", "Lab 3.6 - fog\Lab 3.6 - fog.vcxproj", "{B5557AEE-B16E-43C7-A244-50190B78DF5B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 4 Cube setup", "Lab 4 template setup\Lab 4 template setup.vcxproj", "{C159A4F1-C6B3-421C-8544-D53D1585228C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -121,6 +123,14 @@ Global
 		{B5557AEE-B16E-43C7-A244-50190B78DF5B}.Release|x64.Build.0 = Release|x64
 		{B5557AEE-B16E-43C7-A244-50190B78DF5B}.Release|x86.ActiveCfg = Release|Win32
 		{B5557AEE-B16E-43C7-A244-50190B78DF5B}.Release|x86.Build.0 = Release|Win32
+		{C159A4F1-C6B3-421C-8544-D53D1585228C}.Debug|x64.ActiveCfg = Debug|x64
+		{C159A4F1-C6B3-421C-8544-D53D1585228C}.Debug|x64.Build.0 = Debug|x64
+		{C159A4F1-C6B3-421C-8544-D53D1585228C}.Debug|x86.ActiveCfg = Debug|Win32
+		{C159A4F1-C6B3-421C-8544-D53D1585228C}.Debug|x86.Build.0 = Debug|Win32
+		{C159A4F1-C6B3-421C-8544-D53D1585228C}.Release|x64.ActiveCfg = Release|x64
+		{C159A4F1-C6B3-421C-8544-D53D1585228C}.Release|x64.Build.0 = Release|x64
+		{C159A4F1-C6B3-421C-8544-D53D1585228C}.Release|x86.ActiveCfg = Release|Win32
+		{C159A4F1-C6B3-421C-8544-D53D1585228C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
