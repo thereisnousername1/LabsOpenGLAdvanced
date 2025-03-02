@@ -31,6 +31,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 4.1 - Single Texture", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 4.2 - Multi Texture", "Lab 4.2 - multi texture\Lab 4.2 - multi texture.vcxproj", "{11606778-1DEE-4541-A5C3-EDAA6D8C64CD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 4.3 - Alpha Discard", "Lab 4.3 - alpha discard\Lab 4.3 - alpha discard.vcxproj", "{910358C7-7AA1-4819-A677-A83F0217D243}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -151,6 +153,14 @@ Global
 		{11606778-1DEE-4541-A5C3-EDAA6D8C64CD}.Release|x64.Build.0 = Release|x64
 		{11606778-1DEE-4541-A5C3-EDAA6D8C64CD}.Release|x86.ActiveCfg = Release|Win32
 		{11606778-1DEE-4541-A5C3-EDAA6D8C64CD}.Release|x86.Build.0 = Release|Win32
+		{910358C7-7AA1-4819-A677-A83F0217D243}.Debug|x64.ActiveCfg = Debug|x64
+		{910358C7-7AA1-4819-A677-A83F0217D243}.Debug|x64.Build.0 = Debug|x64
+		{910358C7-7AA1-4819-A677-A83F0217D243}.Debug|x86.ActiveCfg = Debug|Win32
+		{910358C7-7AA1-4819-A677-A83F0217D243}.Debug|x86.Build.0 = Debug|Win32
+		{910358C7-7AA1-4819-A677-A83F0217D243}.Release|x64.ActiveCfg = Release|x64
+		{910358C7-7AA1-4819-A677-A83F0217D243}.Release|x64.Build.0 = Release|x64
+		{910358C7-7AA1-4819-A677-A83F0217D243}.Release|x86.ActiveCfg = Release|Win32
+		{910358C7-7AA1-4819-A677-A83F0217D243}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
