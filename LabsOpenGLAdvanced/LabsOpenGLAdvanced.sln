@@ -33,6 +33,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 4.2 - Multi Texture", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 4.3 - Alpha Discard", "Lab 4.3 - alpha discard\Lab 4.3 - alpha discard.vcxproj", "{910358C7-7AA1-4819-A677-A83F0217D243}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 4.4 - Normal Mapping", "Lab 4.4 - normal map\Lab 4.4 - normal map.vcxproj", "{C1E0B105-9A78-4B02-9C99-133C6FB85C8B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -161,6 +163,14 @@ Global
 		{910358C7-7AA1-4819-A677-A83F0217D243}.Release|x64.Build.0 = Release|x64
 		{910358C7-7AA1-4819-A677-A83F0217D243}.Release|x86.ActiveCfg = Release|Win32
 		{910358C7-7AA1-4819-A677-A83F0217D243}.Release|x86.Build.0 = Release|Win32
+		{C1E0B105-9A78-4B02-9C99-133C6FB85C8B}.Debug|x64.ActiveCfg = Debug|x64
+		{C1E0B105-9A78-4B02-9C99-133C6FB85C8B}.Debug|x64.Build.0 = Debug|x64
+		{C1E0B105-9A78-4B02-9C99-133C6FB85C8B}.Debug|x86.ActiveCfg = Debug|Win32
+		{C1E0B105-9A78-4B02-9C99-133C6FB85C8B}.Debug|x86.Build.0 = Debug|Win32
+		{C1E0B105-9A78-4B02-9C99-133C6FB85C8B}.Release|x64.ActiveCfg = Release|x64
+		{C1E0B105-9A78-4B02-9C99-133C6FB85C8B}.Release|x64.Build.0 = Release|x64
+		{C1E0B105-9A78-4B02-9C99-133C6FB85C8B}.Release|x86.ActiveCfg = Release|Win32
+		{C1E0B105-9A78-4B02-9C99-133C6FB85C8B}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

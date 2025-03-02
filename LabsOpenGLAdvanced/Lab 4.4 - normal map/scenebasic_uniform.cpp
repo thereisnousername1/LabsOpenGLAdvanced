@@ -31,16 +31,17 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
 
     tPrev(0),  // added in lab 3.4, for spinning logic
 
-    // lab 4.3
+    // lab 4.4
 
     angle(0.0f),
-    rotSpeed(glm::pi<float>() / 2.0f),
-    teapot(14, glm::mat4(1.0f))
-
-    // lab 4.3
+    // rotSpeed(glm::pi<float>() / 2.0f)
+    rotSpeed(glm::pi<float>() / 8.0f)   // rotation speed decreased
+    // teapot(14, glm::mat4(1.0f))
 {
-    //                       relative file location in my computer            , bool center (according to the IDE)
-    // mesh = ObjMesh::load("../Lab 3.3 - pig mesh/media/pig_triangulated.obj", true);
+    //                   file name, bool center (according to the IDE), bool genTangents (according to the IDE)
+    ogre = ObjMesh::load("media/bs_ears.obj", false, true);
+
+    // lab 4.4
 }
 
 // init(), initialization of everything in a scene happen in here
@@ -56,13 +57,9 @@ void SceneBasic_Uniform::initScene()
     // the view is a bit different from lab cuz I like it more
     // view = glm::lookAt(vec3(1.0f, 1.25f, 1.25f), vec3(0.0f, -0.1f, 0.0f), vec3(0.0f, 1.0f, 0.0f));   // moved to render() since lab 4.3
     projection = mat4(1.0f);
-
-    // lab 3.4, rotation logic of the light(s)
     
-    // init float angle
+    // init float angle, duplicate setting cuz it has been declared in constructor
     angle = 0.0f;
-
-    // lab 3.4
 
     #pragma region (Light related) Light (diffuse, ambient, specular) intensity setting
     
@@ -72,7 +69,7 @@ void SceneBasic_Uniform::initScene()
 
     #pragma endregion
 
-    // lab 4.2
+    // lab 4.4
 
     #pragma region Texture files linking
     
@@ -101,21 +98,20 @@ void SceneBasic_Uniform::initScene()
     */
 
     // if they are not load together, the mixing of both texture will not take place
-    brick = Texture::loadTexture("media/texture/brick1.jpg");
-    // brick = Texture::loadTexture("media/texture/cement.jpg");    // try to map different image
-    moss = Texture::loadTexture("media/texture/moss.png");
+    GLuint diffTex = Texture::loadTexture("media/texture/ogre_diffuse.png");
+    GLuint normalTex = Texture::loadTexture("media/texture/ogre_normalmap.png");
 
     // texture 1 of multiple texture
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, brick);
+    glBindTexture(GL_TEXTURE_2D, diffTex);
 
     // texture 2 of multiple texture
     glActiveTexture(GL_TEXTURE0 + 1);
-    glBindTexture(GL_TEXTURE_2D, moss);
+    glBindTexture(GL_TEXTURE_2D, normalTex);
 
     #pragma endregion
 
-    // lab 4.2
+    // lab 4.4
 
 }
 
@@ -181,18 +177,27 @@ void SceneBasic_Uniform::render()
     /// Here it is single directional light, basic one
     // vec4 lightPos = vec4(0.0f, 10.0f, 0.0f, 1.0f);  // static position
     
-    // lab 4.3 - camera logic modified since lab 4.3
+    // lab 4.4 - camera movement logic added since lab 4.3
 
     // vec4 lightPos = vec4(10.0f * cos(angle), 10.0f, 10.0f * sin(angle), 1.0f);  // spinning rotation
-    vec3 focus = vec3(6.0f * cos(angle), 1.0f, 6.0f * sin(angle));  // lab 4.3, name is changed to cameraPos in lab
+    // vec3 focus = vec3(6.0f * cos(angle), 1.0f, 6.0f * sin(angle));  // lab 4.3, name is changed to cameraPos in lab
+    vec3 focus = vec3(-1.0f * cos(angle), 0.25f, 2.0f * sin(angle));  // lab 4.4
 
-    // view = glm::lookAt(vec3(1.0f, 1.25f, 1.25f), vec3(0.0f, -0.1f, 0.0f), vec3(0.0f, 1.0f, 0.0f));   // static camera position
+    /// SWITCHABLE ///
+
+    // view = glm::lookAt(vec3(-1.0f, 0.25f, 2.0f), vec3(0.0f, -0.1f, 0.0f), vec3(0.0f, 1.0f, 0.0f));   // static camera position
     view = glm::lookAt(focus, vec3(0.0f, -0.1f, 0.0f), vec3(0.0f, 1.0f, 0.0f));  // camera x is starring at a point in the void, focus
 
-    // prog.setUniform("Light.Position", vec4(view * lightPos));   // Position of light was changing dynamically
-    prog.setUniform("Light.Position", vec4(0.0f, 0.0f, 0.0f, 1.0f));   // Position of light is now static
+    /// SWITCHABLE ///
 
-    // lab 4.3
+    // prog.setUniform("Light.Position", vec4(view * lightPos));   // Position of light was changing dynamically
+
+    // Dynamically changing position logic of light using in lab 4.4
+    prog.setUniform("Light.Position", view * glm::vec4(10.0f * cos(angle), 1.0f, 10.0f * sin(angle), 1.0f));
+
+    // prog.setUniform("Light.Position", vec4(0.0f, 0.0f, 0.0f, 1.0f));   // Position of light is now static
+
+    // lab 4.4
 
     #pragma endregion
 
@@ -212,12 +217,10 @@ void SceneBasic_Uniform::render()
 
     model = mat4(1.0f);
 
-    model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
     setMatrices();
 
-    // mesh->render();  // disabled since lab 3.4
+    ogre->render();
     // cube.render();
-    teapot.render();
 
     //////////////////// First model ////////////////////
 

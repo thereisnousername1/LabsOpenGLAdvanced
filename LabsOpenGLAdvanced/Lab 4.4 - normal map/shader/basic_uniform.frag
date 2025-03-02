@@ -7,8 +7,8 @@
 ///
 
 // intended to be handled by program, less likely needed to be modified
-in vec3 normal;
-in vec3 position;
+in vec3 normal;         // rename to ViewDir in Lab 4 part 5 video
+in vec3 position;       // rename to LightDir in Lab 4 part 5 video
 
 // lab 4.1 - single texture
 
@@ -74,7 +74,7 @@ vec3 phongModel (vec3 position, vec3 n)
 
     // combined the actual texture with the coordinate
     // to output the color of that texture
-    // vec3 texColor = texture(Tex1, TexCoord).rgb;     // single texture
+    vec3 texColor = texture(Tex1, TexCoord).rgb;     // single texture
 
     /*  disabled in lab 4.3 alpha discard
                                                         // multiple texture (jpg + png(transparent))
@@ -91,7 +91,7 @@ vec3 phongModel (vec3 position, vec3 n)
                                                         // according to the texture 2 alpha channel
     // mapping as single texture
     //                      base texture
-    vec3 texColor = texture(Tex1, TexCoord).rgb;
+    // vec3 texColor = texture(Tex1, TexCoord).rgb;
 
 //// ambient lighting is a constant & omnipresent light source
     // vec3 ambient = Light.La * Material.Ka;   // replaced for combining texture
@@ -175,22 +175,97 @@ vec3 phongModel (vec3 position, vec3 n)
     //// while ambient remains separated, cuz it is unique in the scene
 }
 
+vec3 phongModel (vec3 n)
+{
+    vec3 diffuse = vec3(0.0), specular = vec3(0.0);
+
+    vec3 texColor = texture(Tex1, TexCoord).rgb;    // base texture
+
+    vec3 ambient = Light.La * texColor;
+
+    // light direction
+    //// this part is different from regular phong model
+    vec3 s = normalize(position);
+
+    // According to OpenGL SuperBible p.569 (CH13 - Diffuse Light), this dot product caould be a negative value
+    // max() is placed to prevent such situation, it will justify the negative part to zero
+    float sDotN = max(dot(s, n), 0.0);    // calculate the dot product of normalized normal and light direction
+
+    diffuse = Light.Ld * texColor * sDotN;
+
+    // by default I choose Phong instead of Blinn-Phong
+    if (sDotN > 0.0)
+    {
+        //// this part is different from regular phong model
+        vec3 v = normalize(normal);
+
+        /// SWITCHABLE ///
+
+        // reflection -> Phong Shading
+        vec3 r = reflect(-s, n);
+
+        // calculate the half vector -> Blinn-Phong Shading
+        // vec3 h = normalize(s + v);
+
+        /// SWITCHABLE ///
+    
+        // final spec                            eye reflection angle
+        specular = Light.Ls * Material.Ks * pow(max(dot(r, v), 0.0), Material.shininess);   // reflection -> Phong Shading
+        // specular = Light.Ls * Material.Ks * pow(max(dot(h, n), 0.0), Material.shininess);   // calculate the half vector -> Blinn-Phong Shading
+    
+        /// SWITCHABLE ///
+
+    }
+    // final ouput
+    return diffuse + ambient + specular;
+}
+
 /////////////////// Phong / Blinn-Phong switchable shading model and necessary information ///////////////////
 
 void main()
 {
+    // different mapping methods are done in main()
+    // usually by calling texture() to texture(verb.) the Tex2 in different way
+    // most importantly, these methods have to do something with texColor
+    // for texColor with affect the FragColor by taking part in ambient and diffuse lights
+
+    // lab 4.4 - normal map - reference to OpenGL SuperBible p.585(Ch. 13)
+
+    vec3 normMap = texture(Tex2, TexCoord).xyz;
+    normMap.xy = 2.0 * normMap.xy - 1.0;
+
+    // it should be used only when material has its own normal mapping
+    // FragColor = vec4(phongModel(normalize(normMap)), 1.0);   // lab 4.4 solution
+
+    // lab 4.4
 
     // Basic output logic
     // FragColor = vec4(phongModel(position, normalize(normal)), 1.0);
 
-    // lab 4.3
+    // rough decision model -> comply with vertex shader
+    // decide using normal map or program generate for user
 
-    // Output logic with alpha clipping
+    // Advanced output logic
+    // if it is facing the front
+    if (gl_FrontFacing)
+    {
+        // FragColor = vec4(phongModel(position, normalize(normal)), 1.0);
+        FragColor = vec4(phongModel(normalize(normMap)), 1.0);
+    }
+    else
+    {
+        // FragColor = vec4(phongModel(position, normalize(-normal)), 1.0);
+        FragColor = vec4(phongModel(normalize(-normMap)), 1.0);
+    }
+
+    /* lab 4.3 - alpha map, disabled in lab 4.4
 
     // clipping the base texture (Tex1 rgb) accoding to 
     // the alpha channel of the alpha texture (Tex2 a)
     // in this case alpha is like a mask of the first texture
     //                      alpha map texture
+
+    
     vec4 alphaMap = texture(Tex2, TexCoord);
 
     if (alphaMap.a < 0.15f)
@@ -210,5 +285,5 @@ void main()
         }
     }
 
-    // lab 4.3
+    */ // lab 4.3
 }
