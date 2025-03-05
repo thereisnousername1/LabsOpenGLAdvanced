@@ -231,6 +231,8 @@ void SceneBasic_Uniform::render()
     prog.setUniform("Material.Ka", vec3(?f, ?f, ?f));
     prog.setUniform("Material.shininess", ?f);
 
+    model = mat4(1.0f);
+
     /// these 3 are transform related, could be most commonly used
     // translation            obj  ,along x , y , z
     // model = glm::translate(model, vec3(?f, ?f, ?f));
@@ -242,7 +244,6 @@ void SceneBasic_Uniform::render()
     // model = glm::scale(model, vec3(?f, ?f, ?f));
     /// more examples could refer to COMP3016 CW2
 
-    model = mat4(1.0f);
     setMatrices();
 
     // it seems as a std::unique_ptr<ObjMesh> mesh

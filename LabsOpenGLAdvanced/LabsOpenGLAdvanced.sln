@@ -37,6 +37,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 4.4 - Normal Mapping", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 4.5 - Skybox", "Lab 4.5 - skybox\Lab 4.5 - skybox.vcxproj", "{C6D9FEF6-3C96-4903-ABB0-2164891E76A6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 4.6 - Skybox Reflection", "Lab 4.6 - skybox reflection\Lab 4.6 - skybox reflection.vcxproj", "{82E5674E-E9B0-4E9A-8EC8-27682FC7987F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -181,6 +183,14 @@ Global
 		{C6D9FEF6-3C96-4903-ABB0-2164891E76A6}.Release|x64.Build.0 = Release|x64
 		{C6D9FEF6-3C96-4903-ABB0-2164891E76A6}.Release|x86.ActiveCfg = Release|Win32
 		{C6D9FEF6-3C96-4903-ABB0-2164891E76A6}.Release|x86.Build.0 = Release|Win32
+		{82E5674E-E9B0-4E9A-8EC8-27682FC7987F}.Debug|x64.ActiveCfg = Debug|x64
+		{82E5674E-E9B0-4E9A-8EC8-27682FC7987F}.Debug|x64.Build.0 = Debug|x64
+		{82E5674E-E9B0-4E9A-8EC8-27682FC7987F}.Debug|x86.ActiveCfg = Debug|Win32
+		{82E5674E-E9B0-4E9A-8EC8-27682FC7987F}.Debug|x86.Build.0 = Debug|Win32
+		{82E5674E-E9B0-4E9A-8EC8-27682FC7987F}.Release|x64.ActiveCfg = Release|x64
+		{82E5674E-E9B0-4E9A-8EC8-27682FC7987F}.Release|x64.Build.0 = Release|x64
+		{82E5674E-E9B0-4E9A-8EC8-27682FC7987F}.Release|x86.ActiveCfg = Release|Win32
+		{82E5674E-E9B0-4E9A-8EC8-27682FC7987F}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

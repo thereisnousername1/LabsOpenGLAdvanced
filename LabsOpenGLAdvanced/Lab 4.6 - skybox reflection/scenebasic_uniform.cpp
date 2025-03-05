@@ -31,7 +31,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
 
     tPrev(0),  // added in lab 3.4, for spinning logic
 
-    // lab 4.5
+    // lab 4.6
 
     // angle(0.0f),
     angle(90.0f),
@@ -39,7 +39,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     // rotSpeed(glm::pi<float>() / 2.0f)
     rotSpeed(glm::pi<float>() / 8.0f),   // rotation speed decreased
 
-    // teapot(14, glm::mat4(1.0f))
+    teapot(14, glm::mat4(1.0f)),    // enabled in lab 4.6
 
     sky(100.0f) // skybox is gen with 6 faces like a cube,
     // basically a triangle mesh just getting cubic, and then enter the size of the skybox ~ JJ in lab 4 part 6 video
@@ -47,7 +47,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     //                          file name, bool center (according to the IDE), bool genTangents (according to the IDE)
     // ogre = ObjMesh::load("media/bs_ears.obj", false, true);  // disabled since lab 4.5
 
-    // lab 4.5
+    // lab 4.6
 }
 
 // init(), initialization of everything in a scene happen in here
@@ -86,24 +86,15 @@ void SceneBasic_Uniform::initScene()
 
     // it seems the program will sample the skybox itself
     GLuint cubeTex = Texture::loadHdrCubeMap("media/texture/cube/pisa-hdr/pisa");
-    
-    // not necessary isince lab 4.5
-    // GLuint normalTex = Texture::loadTexture("media/texture/ogre_normalmap.png");
 
     // texture 1 of multiple texture
     glActiveTexture(GL_TEXTURE0);
     // glBindTexture(GL_TEXTURE_2D, diffTex);
     glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
 
-    // not necessary isince lab 4.5
-    // texture 2 of multiple texture
-    // glActiveTexture(GL_TEXTURE0 + 1);
-    // glBindTexture(GL_TEXTURE_2D, normalTex);
-
     #pragma endregion
 
-    // lab 4.5
-
+    // lab 4.
 }
 
 void SceneBasic_Uniform::compile()
@@ -112,6 +103,14 @@ void SceneBasic_Uniform::compile()
 	try {
 		prog.compileShader("shader/basic_uniform.vert");
 		prog.compileShader("shader/basic_uniform.frag");
+
+        // for skybox only
+		skyProg.compileShader("shader/skybox.vert");
+        skyProg.compileShader("shader/skybox.frag");
+
+        // no need to add skyProg.use()
+        skyProg.link();
+
 		prog.link();
 		prog.use();
 	} catch (GLSLProgramException &e) {
@@ -180,7 +179,8 @@ void SceneBasic_Uniform::render()
     /// SWITCHABLE ///
 
     // view = glm::lookAt(vec3(-1.0f, 0.25f, 2.0f), vec3(0.0f, -0.1f, 0.0f), vec3(0.0f, 1.0f, 0.0f));   // static camera position
-    view = glm::lookAt(focus, vec3(0.0f, -0.1f, 0.0f), vec3(0.0f, 1.0f, 0.0f));  // camera x is starring at a point in the void, focus
+    // view = glm::lookAt(focus, vec3(0.0f, -0.1f, 0.0f), vec3(0.0f, 1.0f, 0.0f));  // camera x is starring at a point in the void, focus
+    view = glm::lookAt(focus, vec3(0.0f, 0.2f, 0.0f), vec3(0.0f, 1.0f, 0.0f));  // modified for lab 4.6 only
 
     /// SWITCHABLE ///
 
@@ -197,17 +197,30 @@ void SceneBasic_Uniform::render()
 
     #pragma region (Skybox related) Skybox setting section
 
-    prog.use();
+    // Prog.use();  // renamed since lab 4.6
+    skyProg.use();
 
     model = mat4(1.0f);
 
-    setMatrices();
+    // setMatrices();
+    setMatrices(skyProg);
 
     sky.render();
 
     #pragma endregion
 
-    #pragma region (Disabled) (Material related) Multiple imported model setting section (Will be modified in numerous labs)
+    // lab 4.6
+
+    // using another shader program to render other objects
+    prog.use();
+
+    // WorldCameraPosition seems to be newly introduce from lab 4.6
+    // prog.setUniform("WorldCameraPosition", cameraPos);    // renamed for my program
+    prog.setUniform("WorldCameraPosition", focus);
+
+    // lab 4.6
+
+    #pragma region (Material related) Multiple imported model setting section (Will be modified in numerous labs)
 
     /* disabled since lab 4.5
 
@@ -245,6 +258,7 @@ void SceneBasic_Uniform::render()
     prog.setUniform("Material.shininess", ?f);
 
     model = mat4(1.0f);
+    setMatrices();
 
     /// these 3 are transform related, could be most commonly used
     // translation            obj  ,along x , y , z
@@ -257,8 +271,6 @@ void SceneBasic_Uniform::render()
     // model = glm::scale(model, vec3(?f, ?f, ?f));
     /// more examples could refer to COMP3016 CW2
 
-    setMatrices();
-
     // it seems as a std::unique_ptr<ObjMesh> mesh
     // -> has to be use instead of . notation and so it could be render()
     // ?->render();
@@ -266,6 +278,54 @@ void SceneBasic_Uniform::render()
     */
 
     //////////////////// Second model ////////////////////
+
+
+
+    //////////////////// Model for reflection - lab 4.6 ////////////////////
+
+    // in the tutorial video lab 4 part 6b a simple phong model and the related set of data is used
+    // prog.setUnifrorm("MaterialColor", glm::vec4(0.5f, 0.5f, 0.5f, 0.5f));
+    // it is still phong model for the final output is still vec4 in the end
+    // no matter the complete one where you have to set Kd, Ks, Ka or this simple structure
+    // bu then again, I choose to keep the complete structure by copying my past solutions
+
+    // set color with the phong model struct
+    prog.setUniform("Material.Kd", vec3(0.5f, 0.5f, 0.5f));
+    prog.setUniform("Material.Ks", vec3(0.5f, 0.5f, 0.5f));
+    //prog.setUniform("Material.Ka", vec3(0.5f));
+
+    // set color in simple way
+    prog.setUniform("MaterialColor", glm::vec4(0.5f, 0.5f, 0.5f, 0.5f));
+    
+    // not needed for reflection
+    prog.setUniform("Material.shininess", 0.85f);
+
+    prog.setUniform("ReflectFactor", 0.85f);
+
+    model = mat4(1.0f);
+
+    /// these 3 are transform related, could be most commonly used
+    // translation            obj  ,along x , y , z
+    // model = glm::translate(model, vec3(?f, ?f, ?f));
+
+    // rotation            obj  , how much degree ,along  x,  y, z
+    // model = glm::rotate(model, glm::radians(?f), vec3(?f, ?f, ?f));
+    model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
+
+    // scaling            obj  ,along x , y , z
+    // model = glm::scale(model, vec3(?f, ?f, ?f));
+    /// more examples could refer to COMP3016 CW2
+
+    // an advancement to the setMatrices(), more flexible
+    setMatrices(prog);
+
+    // it seems as a std::unique_ptr<ObjMesh> mesh
+    // -> has to be use instead of . notation and so it could be render()
+    // ?->render();
+    teapot.render();
+    //
+
+    //////////////////// Model for reflection - lab 4.6 ////////////////////
 
     #pragma endregion
 }
@@ -287,7 +347,9 @@ void SceneBasic_Uniform::resize(int w, int h)
 
 }
 
-// to be called for rendering 3d models, unlikely to be edit very often
+// lab 4.6
+
+/* to be called for rendering 3d models, unlikely to be edit very often
 void SceneBasic_Uniform::setMatrices()
 {
     mv = view * model;
@@ -296,9 +358,32 @@ void SceneBasic_Uniform::setMatrices()
     // set the ModelViewMatrix uniform to mv
     prog.setUniform("ModelViewMatrix", mv);
 
+    // not using in lab 4.6
     // set the NormalMatrix uniform to following structure
-    prog.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
+    // prog.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
 
     // set uniform for model, view, projection (MVP) and pass in the projection matrix * model view matrix
     prog.setUniform("MVP", projection * mv);
 }
+*/
+
+void SceneBasic_Uniform::setMatrices(GLSLProgram &p)
+{
+    mv = view * model;
+
+    // besides of setUniform, there are also setMat4, and etc. (From COMP3016)
+    // set the ModelViewMatrix uniform to mv
+    // p.setUniform("ModelViewMatrix", mv);
+
+    // p.setUniform("ModelMatrix", mv);    // this provide a variation of reflection
+    p.setUniform("ModelMatrix", model);    // this provide another variation of reflection
+
+    // not using in lab 4.6
+    // set the NormalMatrix uniform to following structure
+    // p.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
+
+    // set uniform for model, view, projection (MVP) and pass in the projection matrix * model view matrix
+    p.setUniform("MVP", projection * mv);
+}
+
+// lab 4.6
