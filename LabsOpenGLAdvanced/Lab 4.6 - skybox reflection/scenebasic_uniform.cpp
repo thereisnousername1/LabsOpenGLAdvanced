@@ -58,6 +58,14 @@ void SceneBasic_Uniform::initScene()
 
     glEnable(GL_DEPTH_TEST);
 
+    //// Transparency function ////
+    //// from internet ////
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+
+    //// Transparency function ////
+
     // model, view, projection matrix initialization and setup (for 3D scene)
     // model = mat4(1.0f);  // not necessary for skybox, disabled since lab 4.5
 
