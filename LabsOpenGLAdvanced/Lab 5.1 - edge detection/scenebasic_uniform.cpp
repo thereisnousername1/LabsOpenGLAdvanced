@@ -1,9 +1,3 @@
-//////////////////// lab 4.8 is taken from lab 4.1 single texture ////////////////////
-
-//////////////////// This lab is awesome ////////////////////
-//////////////////// The function renderToTexture() will render a cow ////////////////////
-//////////////////// The cow is the object to be rendered to the texture of a cube ////////////////////
-//////////////////// Without summoning the cube you can see the cow in the scene ////////////////////
 #include "scenebasic_uniform.h"
 
 #include <cstdio>
@@ -20,12 +14,7 @@ using std::endl;
 #include "helper/glutils.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
-
-// lab 4.1
-
 #include "helper/texture.h" // texture loading related
-
-// lab 4.1
 
 using glm::vec3;
 using glm::vec4;
@@ -35,8 +24,16 @@ using glm::mat4;
 // initialization of mainly 3D models in a scene happen in here, but well I don't care
 SceneBasic_Uniform::SceneBasic_Uniform() :
 
+    // lab 5.1
+
     tPrev(0),  // added in lab 3.4, for spinning logic
-    rotSpeed(glm::pi<float>() / 8.0f)
+    angle(0.0f),
+    rotSpeed(glm::pi<float>() / 8.0f),
+    plane(50.0f, 50.0f, 1, 1),
+    teapot(14, mat4(1.0f)),
+    torus(0.7f * 1.5f, 0.3f * 1.5f, 50, 50)
+
+    // lab 5.1
 {
     //                    relative file location in my computer            , bool center (according to the IDE)
     // mesh = ObjMesh::load("media/spot/spot_triangulated.obj");    // moved to initScene()
@@ -48,6 +45,10 @@ void SceneBasic_Uniform::initScene()
 {
     compile();
 
+    // lab 5.1
+
+    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);   // added since lab 5.1
+
     glEnable(GL_DEPTH_TEST);
 
     // model, view, projection matrix initialization and setup (for 3D scene)
@@ -57,12 +58,7 @@ void SceneBasic_Uniform::initScene()
 
     projection = mat4(1.0f);
 
-    // lab 3.4, rotation logic of the light(s)
-    
-    // init float angle
-    angle = 0.0f;
-
-    // lab 3.4
+    angle = glm::pi<float>() / 4.0f;
 
     #pragma region (Light related) Light (diffuse, ambient, specular) intensity setting
     
@@ -72,8 +68,48 @@ void SceneBasic_Uniform::initScene()
 
     #pragma endregion
 
-    #pragma region Texture files linking
+    setupFBO();
+
+    // Array for full-screen quad
+    GLfloat verts[] =
+    {
+        -1.0f, -1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+        -1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f, 0.0f
+    };
+    GLfloat tc[] =
+    {
+        0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+        0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f
+    };
+
+    // set up the buffers
+    unsigned int handle[2];
+    glGenBuffers(2, handle);
+    glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
+    glBufferData(GL_ARRAY_BUFFER, 6 * 3 * sizeof(float), verts, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
+    glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float), tc, GL_STATIC_DRAW);
+
+    // Set up the vertex array object
+    glGenVertexArrays(1, &fsQuad);
+    glBindVertexArray(fsQuad);
+
+    glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
+    glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0); // Vertex position
+
+    glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
+    glVertexAttribPointer((GLuint)2, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(2); // Texture coordinates
+
+    glBindVertexArray(0);
+
+    prog.setUniform("EdgeThreshold", 0.05f);
+
+
+    #pragma region (Disabled) Texture files linking
     
+    /* Disabled since lab 5.1
     // reference : https://www.reddit.com/r/opengl/comments/1f1wizb/how_bad_is_it_to_only_use_gl_texture0_and_what_is/
     //             https://stackoverflow.com/questions/8866904/differences-and-relationship-between-glactivetexture-and-glbindtexture
     //             https://community.khronos.org/t/when-to-use-glactivetexture/64913/2
@@ -102,9 +138,11 @@ void SceneBasic_Uniform::initScene()
     // Order 3 :
     // the type of obj you want to declare as, obj to be bind
     glBindTexture(GL_TEXTURE_2D, texID);
+    */
 
     #pragma endregion
-
+    
+    // lab 5.1
 }
 
 void SceneBasic_Uniform::compile()
@@ -152,33 +190,43 @@ void SceneBasic_Uniform::update( float t )
 
 }
 
-// this function stored model / mesh / object declared and awaits to be rendered in scene
+// this function now call other function(s) awaits to be executed in scene
 void SceneBasic_Uniform::render()
 {
-    // Since the 2 objects is treated as, well separate 2 object
-    // their transform is totally different
-    // resize the viewport could affects how they look in the scene
+    // resizing won't work for this lab, because the area to render
+    // is defined in the beginning, initScene()
     // 
     // this is viewport resizing logic (I figure it out by myself)
     // now the content will stick to the window size when resizing happened
     glfwGetFramebufferSize(glfwGetCurrentContext(), &viewportWidth, &viewportHeight);
     resize(viewportWidth, viewportHeight);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
-    renderToTexture();
+    // glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);    // disabled since lab 5.1
+    // renderToTexture();                               // disabled since lab 5.1
+    pass1();
     glFlush();  // flush the buffer and remove the texture loaded
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    renderScene();
-    glFlush();  // flush the buffer and remove the texture loaded
+    // glBindFramebuffer(GL_FRAMEBUFFER, 0);            // disabled since lab 5.1
+    // renderScene();                                   // disabled since lab 5.1
+    pass2();
+    // glFlush();  // flush the buffer and remove the texture loaded    // disabled since lab 5.1
 }
 
-// this function stored the mesh declared which looks like a cow and awaits to be rendered in scene
+// this function stored the model / mesh / object declared and awaits to be detect with their edge
 // void SceneBasic_Uniform::render()    // renamed to renderToTexture()
-void SceneBasic_Uniform::renderToTexture()
+// void SceneBasic_Uniform::renderToTexture()   // renamed since lab 5.1
+void SceneBasic_Uniform::pass1()
 {
-    prog.setUniform("RenderTex", 1);
-    glViewport(0, 0, 512, 512);
+    // prog.setUniform("RenderTex", 1); // replaced since lab 5.1
+    prog.setUniform("Pass", 1);
+    // glViewport(0, 0, 512, 512);      // disabled since lab 5.1
+
+    // added since lab 5.1
+    
+    glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
+    glEnable(GL_DEPTH_TEST);
+
+    // added since lab 5.1
 
     // clear color buffer and clear color & depth buffers
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -191,10 +239,14 @@ void SceneBasic_Uniform::renderToTexture()
     // lab 4.8 - camera logic modified since lab 4.3
 
     // vec4 lightPos = vec4(10.0f * cos(angle), 10.0f, 10.0f * sin(angle), 1.0f);  // spinning rotation
-    // vec3 focus = vec3(1.0f * cos(angle), 1.25f, 1.25f * sin(angle));  // lab 4.8, name is changed to cameraPos in lab
+    vec3 focus = vec3(7.0f * cos(angle), 4.0f, 7.0f * sin(angle));  // lab 5.1, name is changed to cameraPos in lab
 
-    view = glm::lookAt(vec3(0.0f, 0.0f, 2.5f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));   // static camera position
-    // view = glm::lookAt(focus, vec3(0.0f, -0.1f, 0.0f), vec3(0.0f, 1.0f, 0.0f));  // camera x is starring at a point in the void, focus
+    // view = glm::lookAt(vec3(0.0f, 0.0f, 2.5f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));   // static camera position
+    view = glm::lookAt(focus, vec3(0.0f, -0.1f, 0.0f), vec3(0.0f, 1.0f, 0.0f));  // camera x is starring at a point in the void, focus
+
+    // setting the aspect ratio for the cow mesh, effects is like zoom in
+    //                                                  declared in scene.h
+    projection = glm::perspective(glm::radians(60.0f), (float)width / height, 0.3f, 100.0f);
 
     // prog.setUniform("Light.Position", vec4(view * lightPos));   // Position of light was changing dynamically
     prog.setUniform("Light.Position", vec4(0.0f, 0.0f, 0.0f, 1.0f));   // lab 4.8
@@ -212,20 +264,59 @@ void SceneBasic_Uniform::renderToTexture()
 
     //////////////////// First model(s) ////////////////////
 
-    // prog.setUniform("Material.Kd", vec3(0.2f, 0.55f, 0.9f));                         // disabled in lab 4.8
+    prog.setUniform("Material.Kd", vec3(0.9f, 0.9f, 0.9f));     // enabled in lab 5.1
     prog.setUniform("Material.Ks", vec3(0.95f, 0.95f, 0.95f));
-    // prog.setUniform("Material.Ka", vec3(0.2f * 0.3f, 0.55f * 0.3f, 0.9f * 0.3f));    // disabled in lab 4.8
+    prog.setUniform("Material.Ka", vec3(0.1f, 0.1f, 0.1f));     // enabled in lab 5.1
     prog.setUniform("Material.shininess", 100.0f);
 
     model = mat4(1.0f);
 
-    model = glm::rotate(model, angle, vec3(0.0f, 1.0f, 0.0f));                          // changed in lab 4.8
+    model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));  // changed in lab 5.1
+    setMatrices();
+    
+    // mesh->render();
+    teapot.render();
+    
+    //////////////////// First model ////////////////////
+
+
+
+    //////////////////// Second model ////////////////////
+
+    prog.setUniform("Material.Kd", vec3(0.4f, 0.4f, 0.4f));
+    prog.setUniform("Material.Ks", vec3(0.0f, 0.0f, 0.0f));
+    prog.setUniform("Material.Ka", vec3(0.1f, 0.1f, 0.1f));
+    prog.setUniform("Material.shininess", 100.0f);
+
+    model = mat4(1.0f);
+
+    model = glm::translate(model, vec3(0.0f, -0.75f, 0.0f));
     setMatrices();
 
-    mesh->render();  // this mesh here is actually referring to the spot object, which looks like a cow
-    // cube.render();
+    plane.render();
 
-    //////////////////// First model ////////////////////
+    //////////////////// Second model ////////////////////
+
+
+
+    //////////////////// Third model ////////////////////
+
+    prog.setUniform("Material.Kd", vec3(0.9f, 0.5f, 0.2f));
+    prog.setUniform("Material.Ks", vec3(0.0f, 0.0f, 0.0f));
+    prog.setUniform("Material.Ka", vec3(0.1f, 0.1f, 0.1f));
+    prog.setUniform("Material.shininess", 100.0f);
+
+    model = mat4(1.0f);
+
+    // it has to execute before rotate or the torus gone nowhere (probably blocked by something else)
+    model = glm::translate(model, vec3(1.0f, 1.0f, 3.0f));
+    model = glm::rotate(model, glm::radians(90.0f), vec3(1.0f, 0.0f, 0.0f));
+    
+    setMatrices();
+
+    torus.render();
+
+    //////////////////// Third model ////////////////////
 
 
 
@@ -263,15 +354,38 @@ void SceneBasic_Uniform::renderToTexture()
     #pragma endregion
 }
 
-// this function stored the cube declared which is awaiting the spot to be rendered onto it and awaits to be rendered in scene
-void SceneBasic_Uniform::renderScene()
+// since this is edge detection, nothing except the edge is needed to draw in here
+// void SceneBasic_Uniform::renderScene()   // renamed since lab 5.1
+void SceneBasic_Uniform::pass2()
 {
-    prog.setUniform("RenderTex", 0);
-    //              declared in scene.h
-    glViewport(0, 0, width, height);
+    // lab 5.1
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // prog.setUniform("RenderTex", 1); // replaced since lab 5.1
+    prog.setUniform("Pass", 2);
 
+    // Disabled since lab 5.1
+    // glViewport(0, 0, width, height);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glActiveTexture(GL_TEXTURE0);
+    // glBindTexture(GL_TEXTURE_2D, renderTex); // modified from lab sheet 5
+    glBindTexture(GL_TEXTURE_2D, Tex1);
+
+    glDisable(GL_DEPTH_TEST);
+
+    // clear color buffer
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    model = mat4(1.0f);
+    view = mat4(1.0f);
+    projection = mat4(1.0f);
+
+    setMatrices();
+
+    glBindVertexArray(fsQuad);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
+    /* Disabled since lab 5.1
     /// Here it is single directional light, basic one
     // vec4 lightPos = vec4(0.0f, 10.0f, 0.0f, 1.0f);  // static position
 
@@ -301,6 +415,9 @@ void SceneBasic_Uniform::renderScene()
 
     cube.render();  // the cube here has its own texture, and the cow is the object to render onto the cube
                     // without prper texture mapping they looks like they are overlapped
+    */
+
+    // lab 5.1
 }
 
 #pragma endregion
@@ -313,6 +430,9 @@ void SceneBasic_Uniform::resize(int w, int h)
 
     width = w;
     height = h;
+
+    //////////////////// USING THIS METHOD TO UPDATE VIEWPORT SIZE IS EXTREMLY EXPENSIVE ////////////////////
+    // setupFBO();
 
     // setting the aspect ratio for the model according to the window size
     // without this line it will not render
@@ -336,25 +456,36 @@ void SceneBasic_Uniform::setMatrices()
     prog.setUniform("MVP", projection * mv);
 }
 
+// width, height are massively used in all lab 5 solutions
+// since setupFBO() is called in initScene()
+// the viewport settled always has fixed size
 void SceneBasic_Uniform::setupFBO()
 {
-    // from lab sheet 4 p.15
-
     // Generate and bind the framebuffer
     glGenFramebuffers(1, &fboHandle);
     glBindFramebuffer(GL_FRAMEBUFFER, fboHandle); 
 
     // Create the texture object
-    GLuint renderTex;
-    glGenTextures(1, &renderTex); 
-    glActiveTexture(GL_TEXTURE0); // Use texture unit0, thats why avoid using the same slot when init
-    glBindTexture(GL_TEXTURE_2D, renderTex);
-    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, 512, 512);
+    // GLuint renderTex;    // disabled since lab 5.1
+    // glGenTextures(1, &renderTex);            // renamed as Tex1
+    glGenTextures(1, &Tex1);
+
+    // disabled since lab 5.1
+    // glActiveTexture(GL_TEXTURE0); // Use texture unit0, thats why avoid using the same slot when init
+    
+    // glBindTexture(GL_TEXTURE_2D, renderTex); // renamed as Tex1
+    glBindTexture(GL_TEXTURE_2D, Tex1);
+
+    // glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, 512, 512);    // replaced since lab 5.1
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
+
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);   // added since lab 5.1
     
     // Bind the texture to the FBO
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTex, 0);
+    // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTex, 0);   // renamed as Tex1
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Tex1, 0);
 
     // depth section
     
@@ -363,7 +494,10 @@ void SceneBasic_Uniform::setupFBO()
     GLuint depthBuf;
     glGenRenderbuffers(1, &depthBuf);
     glBindRenderbuffer(GL_RENDERBUFFER, depthBuf);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 512, 512);
+
+    // replaced since lab 5.1
+    // glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 512, 512);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
     
     // Bind the depth buffer to the FBO 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, 

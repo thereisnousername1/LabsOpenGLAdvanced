@@ -283,10 +283,9 @@ void SceneBasic_Uniform::render()
     // -> has to be use instead of . notation and so it could be render()
     // ?->render();
     ?.render();
-    */
-
+    
     //////////////////// Second model ////////////////////
-
+    */
 
 
     //////////////////// Model for reflection - lab 4.6 ////////////////////

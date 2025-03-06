@@ -43,6 +43,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 4.7 - Projected Texture
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 4.8 - Render to Texture", "Lab 4.8 - render to texture\Lab 4.8 - render to texture.vcxproj", "{F2BCFDC3-6D3C-4861-8BDC-DCFA7FECA8BA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 5.1 - Edge Detection", "Lab 5.1 - edge detection\Lab 5.1 - edge detection.vcxproj", "{14EFA96E-5094-49EF-B5C7-ABC8DF97D3AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -211,6 +213,14 @@ Global
 		{F2BCFDC3-6D3C-4861-8BDC-DCFA7FECA8BA}.Release|x64.Build.0 = Release|x64
 		{F2BCFDC3-6D3C-4861-8BDC-DCFA7FECA8BA}.Release|x86.ActiveCfg = Release|Win32
 		{F2BCFDC3-6D3C-4861-8BDC-DCFA7FECA8BA}.Release|x86.Build.0 = Release|Win32
+		{14EFA96E-5094-49EF-B5C7-ABC8DF97D3AD}.Debug|x64.ActiveCfg = Debug|x64
+		{14EFA96E-5094-49EF-B5C7-ABC8DF97D3AD}.Debug|x64.Build.0 = Debug|x64
+		{14EFA96E-5094-49EF-B5C7-ABC8DF97D3AD}.Debug|x86.ActiveCfg = Debug|Win32
+		{14EFA96E-5094-49EF-B5C7-ABC8DF97D3AD}.Debug|x86.Build.0 = Debug|Win32
+		{14EFA96E-5094-49EF-B5C7-ABC8DF97D3AD}.Release|x64.ActiveCfg = Release|x64
+		{14EFA96E-5094-49EF-B5C7-ABC8DF97D3AD}.Release|x64.Build.0 = Release|x64
+		{14EFA96E-5094-49EF-B5C7-ABC8DF97D3AD}.Release|x86.ActiveCfg = Release|Win32
+		{14EFA96E-5094-49EF-B5C7-ABC8DF97D3AD}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
