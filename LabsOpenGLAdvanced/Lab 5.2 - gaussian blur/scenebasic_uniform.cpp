@@ -37,7 +37,12 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
 {
     //                    relative file location in my computer            , bool center (according to the IDE)
     // mesh = ObjMesh::load("media/spot/spot_triangulated.obj");    // moved to initScene()
+    
+    // for instant gauss calculate with sigma2 changeable (Key I -> ++, K -> --)
+    temp = Scene::sigma2;   // sigma2 is declared in scene.h
 }
+
+float weights[5], sum;  // declared as global for instant gauss calculate
 
 // init(), initialization of everything in a scene happen in here
 // Light intensity setting to be placed in here (Well actually that does not matter at all, so as all setting to be import to shader)
@@ -47,7 +52,7 @@ void SceneBasic_Uniform::initScene()
 
     // lab 5.1
 
-    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);   // added since lab 5.1
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);   // modified since lab 5.2
 
     glEnable(GL_DEPTH_TEST);
 
@@ -68,7 +73,11 @@ void SceneBasic_Uniform::initScene()
 
     #pragma endregion
 
-    setupFBO();
+    // since resize() is called in scenerunner run() after initScene(),
+    // only 1 setupFBO() is necessary to appears in initScene() and resize()
+    // put it in resize() with proper deallocate function could perform a cool ass
+    // viewport resize feature
+    // setupFBO();
 
     // Array for full-screen quad
     GLfloat verts[] =
@@ -82,7 +91,7 @@ void SceneBasic_Uniform::initScene()
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f
     };
 
-    #pragma region Image Processing Techniques - Edge Detection
+    #pragma region Image Processing Techniques - Gaussian Blur
 
     // set up the buffers
     unsigned int handle[2];
@@ -106,11 +115,31 @@ void SceneBasic_Uniform::initScene()
 
     glBindVertexArray(0);
 
-    //// Edge Detection ////
+    //// Gaussian Blur ////
     
-    prog.setUniform("EdgeThreshold", 0.05f);
+    //                        this number decide the level of blur, BUT
+    //                        it works in a weird way, number too large / too small
+    //                        won't create huge impact
+    // float weights[5], sum, sigma2 = 8.0f;    // declared as global for instant gauss calculate
 
-    //// Edge Detection ////
+    //Compute and sum the weights
+    weights[0] = gauss(0.0f ,sigma2);
+    sum = weights[0];
+
+    for (int i = 1; i < 5; i++) {
+        weights[i] = gauss(float(i), sigma2);
+        sum += 2 * weights[i];
+    }
+
+    //Normalize the weights and set the uniform
+    for (int i = 0; i < 5; i++) {
+        std::stringstream uniName;
+        uniName << "Weight[" << i << "]";
+        float val = weights[i] / sum;
+        prog.setUniform(uniName.str().c_str(), val);
+    }
+
+    //// Gaussian Blur ////
 
     #pragma endregion
 
@@ -195,28 +224,62 @@ void SceneBasic_Uniform::update( float t )
 
     #pragma endregion
 
+    // instant gauss calculate with sigma2 changeable (Key I -> ++, K -> --)
+    if (temp != sigma2)
+    {
+        //Compute and sum the weights
+        weights[0] = gauss(0.0f, sigma2);
+        sum = weights[0];
+
+        for (int i = 1; i < 5; i++) {
+            weights[i] = gauss(float(i), sigma2);
+            sum += 2 * weights[i];
+        }
+
+        //Normalize the weights and set the uniform
+        for (int i = 0; i < 5; i++) {
+            std::stringstream uniName;
+            uniName << "Weight[" << i << "]";
+            float val = weights[i] / sum;
+            prog.setUniform(uniName.str().c_str(), val);
+        }
+
+        temp = Scene::sigma2;
+    }
+
 }
 
 // this function now call other function(s) awaits to be executed in scene
 void SceneBasic_Uniform::render()
 {
-    // resizing won't work for this lab, because the area to render
-    // is defined in the beginning, initScene()
+    // lab 5.2
+
+    // resizing will work this time, but still not ideal
+    // it regen the FBO when its necessary to
     // 
     // this is viewport resizing logic (I figure it out by myself)
     // now the content will stick to the window size when resizing happened
     glfwGetFramebufferSize(glfwGetCurrentContext(), &viewportWidth, &viewportHeight);
-    resize(viewportWidth, viewportHeight);
+    if (viewportWidth != width && viewportHeight != height)
+    {
+        byeFBO();
+        // setupFBO();
+        resize(viewportWidth, viewportHeight);
+    }
 
+    // lab 5.2
+    
     // glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);    // disabled since lab 5.1
     // renderToTexture();                               // disabled since lab 5.1
     pass1();
-    glFlush();  // flush the buffer and remove the texture loaded
+    // glFlush();  // flush the buffer and remove the texture loaded
 
     // glBindFramebuffer(GL_FRAMEBUFFER, 0);            // disabled since lab 5.1
     // renderScene();                                   // disabled since lab 5.1
     pass2();
     // glFlush();  // flush the buffer and remove the texture loaded    // disabled since lab 5.1
+
+    pass3();
 }
 
 // this function stored the model / mesh / object declared and awaits to be detect with their edge
@@ -228,12 +291,14 @@ void SceneBasic_Uniform::pass1()
     prog.setUniform("Pass", 1);
     // glViewport(0, 0, 512, 512);      // disabled since lab 5.1
 
-    // added since lab 5.1
+    // lab 5.2
     
-    glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
+    // glBindFramebuffer(GL_FRAMEBUFFER, fboHandle); // replaced
+    glBindFramebuffer(GL_FRAMEBUFFER, renderFBO);
+
     glEnable(GL_DEPTH_TEST);
 
-    // added since lab 5.1
+    // lab 5.2
 
     // clear color buffer and clear color & depth buffers
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -308,7 +373,7 @@ void SceneBasic_Uniform::pass1()
 
     //////////////////// Third model ////////////////////
 
-    prog.setUniform("Material.Kd", vec3(0.9f, 0.5f, 0.2f));
+    prog.setUniform("Material.Kd", vec3(0.2f, 0.5f, 0.9f));     // modified since lab 5.2
     prog.setUniform("Material.Ks", vec3(0.0f, 0.0f, 0.0f));
     prog.setUniform("Material.Ka", vec3(0.1f, 0.1f, 0.1f));
     prog.setUniform("Material.shininess", 100.0f);
@@ -373,7 +438,8 @@ void SceneBasic_Uniform::pass2()
     // Disabled since lab 5.1
     // glViewport(0, 0, width, height);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // glBindFramebuffer(GL_FRAMEBUFFER, 0);    // replaced since lab 5.2
+    glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
     glActiveTexture(GL_TEXTURE0);
     // glBindTexture(GL_TEXTURE_2D, renderTex); // modified from lab sheet 5
     glBindTexture(GL_TEXTURE_2D, Tex1);
@@ -391,7 +457,7 @@ void SceneBasic_Uniform::pass2()
 
     glBindVertexArray(fsQuad);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    glBindVertexArray(0);
+    // glBindVertexArray(0);    // disabled since lab 5.2
     /* Disabled since lab 5.1
     /// Here it is single directional light, basic one
     // vec4 lightPos = vec4(0.0f, 10.0f, 0.0f, 1.0f);  // static position
@@ -427,7 +493,32 @@ void SceneBasic_Uniform::pass2()
     // lab 5.1
 }
 
+void SceneBasic_Uniform::pass3()
+{
+    prog.setUniform("Pass", 3);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glActiveTexture(GL_TEXTURE0);
+
+    glBindTexture(GL_TEXTURE_2D, intermediateTex);
+
+    // clear color buffer
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    model = mat4(1.0f);
+    view = mat4(1.0f);
+    projection = mat4(1.0f);
+
+    setMatrices();
+
+    // Render the full-screen quad
+    glBindVertexArray(fsQuad);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
 #pragma endregion
+
+// lab 5.2
 
 // unlikely to be edit very often
 void SceneBasic_Uniform::resize(int w, int h)
@@ -438,14 +529,16 @@ void SceneBasic_Uniform::resize(int w, int h)
     width = w;
     height = h;
 
-    //////////////////// USING THIS METHOD TO UPDATE VIEWPORT SIZE IS EXTREMLY EXPENSIVE ////////////////////
-    // setupFBO();
+    // it replace the one in initScene()
+    setupFBO();
 
     // setting the aspect ratio for the model according to the window size
     // without this line it will not render
     projection = glm::perspective(glm::radians(70.0f), (float)w / h, 0.3f, 100.0f);
 
 }
+
+// lab 5.2
 
 // to be called for rendering 3d models, unlikely to be edit very often
 void SceneBasic_Uniform::setMatrices()
@@ -465,16 +558,21 @@ void SceneBasic_Uniform::setMatrices()
 
 // width, height are massively used in all lab 5 solutions
 // since setupFBO() is called in initScene()
-// the viewport settled always has fixed size
+// the viewport settled always has fixed size, but you can always do setupFBO()
 void SceneBasic_Uniform::setupFBO()
 {
     // Generate and bind the framebuffer
-    glGenFramebuffers(1, &fboHandle);
-    glBindFramebuffer(GL_FRAMEBUFFER, fboHandle); 
+    // glGenFramebuffers(1, &fboHandle);                // replaced
+    // glDeleteFramebuffers(1, &renderFBO);             // Deallocate to free the slot
+    glGenFramebuffers(1, &renderFBO);
+
+    // glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);      // replaced
+    glBindFramebuffer(GL_FRAMEBUFFER, renderFBO);
 
     // Create the texture object
     // GLuint renderTex;    // moved to header since lab 5.1
     // glGenTextures(1, &renderTex);            // renamed as Tex1
+    // glDeleteTextures(1, &Tex1);                      // Deallocate to free the slot
     glGenTextures(1, &Tex1);
 
     // disabled since lab 5.1
@@ -486,16 +584,17 @@ void SceneBasic_Uniform::setupFBO()
     // glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, 512, 512);    // replaced since lab 5.1
     glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);   // added since lab 5.1
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);   // different from lab 5.1
     
     // Bind the texture to the FBO
     // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTex, 0);   // renamed as Tex1
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Tex1, 0);
-
+    
     // Create the depth buffer
-    GLuint depthBuf;
+    // GLuint depthBuf;    // moved to header
+    // glDeleteRenderbuffers(1, &depthBuf);             // Deallocate to free the slot
     glGenRenderbuffers(1, &depthBuf);
     glBindRenderbuffer(GL_RENDERBUFFER, depthBuf);
 
@@ -510,18 +609,62 @@ void SceneBasic_Uniform::setupFBO()
     // Set the targets for the fragment output variables
     GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, drawBuffers);
-    GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (result == GL_FRAMEBUFFER_COMPLETE) {
-        std::cout << "Framebuffer is complete" << endl;
-    }
-    else
-    {
 
-        std::cout << "Framebuffer error:" << result << endl;
+    // Unbind the framebuffer, and revert to default framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    }
+    // Generate and bind the framebuffer
+    // glDeleteFramebuffers(1, &intermediateFBO);       // Deallocate to free the slot
+    glGenFramebuffers(1, &intermediateFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+
+    // Create the texture object
+    // glDeleteTextures(1, &intermediateTex);           // Deallocate to free the slot
+    glGenTextures(1, &intermediateTex);
+
+    glActiveTexture(GL_TEXTURE0);   // Use texture unit 0
+
+    glBindTexture(GL_TEXTURE_2D, intermediateTex);
+
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+
+    // Bind the texture to the FBO
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, intermediateTex, 0);
+    
+    // No depth buffer needed for this FBO
+
+    // Set the targets for the fragment output variables
+    glDrawBuffers(1, drawBuffers);
 
     // Unbind the framebuffer, and revert to default framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 }
+
+// lab 5.2
+
+// this is self-made deallocator, it serve for one reason
+// to free the slots and save some memory (at least I hope it can)
+// it is called when you need to resize the viewport
+void SceneBasic_Uniform::byeFBO()   // each glDelete... correspond to each glGen...
+{
+    glDeleteFramebuffers(1, &renderFBO);
+    glDeleteTextures(1, &Tex1);
+    glDeleteRenderbuffers(1, &depthBuf);
+    glDeleteFramebuffers(1, &intermediateFBO);
+    glDeleteTextures(1, &intermediateTex);
+}
+
+// being called since initScene()
+float SceneBasic_Uniform::gauss(float x, float sigma2)
+{
+    double coeff = 1.0 / (glm::two_pi<double>() * sigma2);
+    double expon = -(x * x) / (2.0 * sigma2);
+    return (float)(coeff * exp(expon));
+}
+
+// lab 5.2

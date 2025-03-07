@@ -25,7 +25,7 @@ private:
 
     glm::mat4 mv;
 
-    // lab 5.1
+    // lab 5.2
     
     // std::unique_ptr<ObjMesh> spot;
     // std::unique_ptr<ObjMesh> mesh;  // disabled since lab 5.1, renamed to spot in video
@@ -38,12 +38,16 @@ private:
 
     float rotSpeed;     // added with lab 4.7 viewer logic
 
+    float temp;         // declared as global for instant gauss calculate
+
     // GLuint fboHandle;   // replaced since lab 5.1
     // rename Tex1 from RenderTex since lab 5.1
-    GLuint fsQuad, Tex1;                            // requires for image processing
-    GLuint fboHandle;                               // requires for edge detection
+    //                   depthBuf declared as global var -> resizing logic(different from lab 5.1)
+    GLuint fsQuad, Tex1, depthBuf;                      // requires for image processing
+    // GLuint fboHandle;                                // requires for edge detection
+    GLuint intermediateTex, renderFBO, intermediateFBO; // requires for gaussian blur
 
-    // lab 5.1
+    // lab 5.2
 
     float tPrev;    // spinning logic related
 
@@ -51,9 +55,11 @@ private:
 
     void compile();
 
-    // lab 5.1
+    // lab 5.2
     
     void setupFBO();
+
+    void byeFBO();
 
     // void renderToTexture();
     void pass1();   // renamed since lab 5.1
@@ -61,7 +67,11 @@ private:
     // void renderScene();
     void pass2();   // renamed since lab 5.1
 
-    // lab 5.1
+    void pass3();   // added in lab 5.2
+
+    float gauss(float, float);  // added in lab 5.2
+
+    // lab 5.2
 
 public:
     SceneBasic_Uniform();

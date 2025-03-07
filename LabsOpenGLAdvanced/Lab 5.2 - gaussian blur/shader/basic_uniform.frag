@@ -10,7 +10,7 @@
 in vec3 normal;
 in vec3 position;
 
-// lab 5.1
+// lab 5.2
 
 // according to https://blog.mmorpgtycoon.com/post/opengl-texture-inconsistent/
 // lets assume the binding word related to the "slot number" of a texture unit
@@ -21,13 +21,9 @@ in vec3 position;
 //
 // actual texture to be imported from program
 
-// renamed from RenderTex in lab 5.1
 layout (binding = 0) uniform sampler2D Tex1; // refer to single texture rendering
 
-// without binding = 0
-// uniform sampler2D RenderTex;
-
-// lab 5.1
+// lab 5.2
 
 // Final Output
 layout (location = 0) out vec4 FragColor;
@@ -149,25 +145,20 @@ vec3 phongModel (vec3 position, vec3 n)
 
 /////////////////// Phong / Blinn-Phong switchable shading model and necessary information ///////////////////
 
-/////////////////// Image Processing Techniques - Edge Detection ///////////////////
+/////////////////// Image Processing Techniques - Gaussian Blur ///////////////////
 
-// lab 5.1
+// lab 5.2
 
 uniform float EdgeThreshold;
 
 // when the uniform pass in from outside, decide what logic it would perform
 uniform int Pass;
 
-// Relative luminance, constant for the edge to glow 
-const vec3 lum = vec3(0.2126, 0.7152, 0.0722);
-
-float luminance(vec3 color)
-{
-    return dot(lum, color);
-}
+uniform float Weight[5];
 
 // they return to FragColor and so they are vec4 function
 // edge detection needs 2 pass()
+// gaussian blur needs 3 pass()
 vec4 pass1()    // always the actual object rendering with lighting model
 {
     return vec4(phongModel(position, normalize(normal)), 1.0);
@@ -175,48 +166,56 @@ vec4 pass1()    // always the actual object rendering with lighting model
 
 vec4 pass2()
 {
-    ivec2 pix= ivec2(gl_FragCoord.xy); //we grab a pixel to check if edge
+    ivec2 pix= ivec2( gl_FragCoord.xy );
 
-    //pick neighbouring pixels for convolution filter
+    vec4 sum = texelFetch(Tex1, pix, 0) * Weight[0];
 
-    //check lecture slides
-
-    float s00 = luminance(texelFetchOffset(Tex1, pix, 0, ivec2(-1, 1)).rgb);
-    float s10 = luminance(texelFetchOffset(Tex1, pix, 0, ivec2(-1, 0)).rgb);
-    float s20 = luminance(texelFetchOffset(Tex1, pix, 0, ivec2(-1, -1)).rgb);
-    float s01 = luminance(texelFetchOffset(Tex1, pix, 0, ivec2(0, 1)).rgb);
-    float s21 = luminance(texelFetchOffset(Tex1, pix, 0, ivec2(0, -1)).rgb);
-    float s02 = luminance(texelFetchOffset(Tex1, pix, 0, ivec2(1, 1)).rgb);
-    float s12 = luminance(texelFetchOffset(Tex1, pix, 0, ivec2(1, 0)).rgb);
-    float s22 = luminance(texelFetchOffset(Tex1, pix, 0, ivec2(1, -1)).rgb);
-
-    float sx = s00 + 2 * s10 + s20 - (s02 + 2 * s12 + s22);
-    float sy = s00 + 2 * s01 + s02 - (s20 + 2 * s21 + s22);
-
-    float g = sx * sx + sy * sy;
+    sum += texelFetchOffset( Tex1, pix, 0, ivec2(0, 1)) * Weight[1];
+    sum += texelFetchOffset( Tex1, pix, 0, ivec2(0, -1)) * Weight[1];
+    sum += texelFetchOffset( Tex1, pix, 0, ivec2(0, 2)) * Weight[2];
+    sum += texelFetchOffset( Tex1, pix, 0, ivec2(0, -2)) * Weight[2];
+    sum += texelFetchOffset( Tex1, pix, 0, ivec2(0, 3)) * Weight[3];
+    sum += texelFetchOffset( Tex1, pix, 0, ivec2(0, -3)) * Weight[3];
+    sum += texelFetchOffset( Tex1, pix, 0, ivec2(0, 4)) * Weight[4]; 
+    sum += texelFetchOffset( Tex1, pix, 0, ivec2(0, -4)) * Weight[4];
     
-    if( g > EdgeThreshold )
-        return vec4(1.0); // edge
-    else
-        // return vec4(0.0, 0.0, 0.0, 1.0); // no edge
-        return texelFetch(Tex1, pix, 0);    // in the video this line is used instead
-        // same as vec4(0.0, 0.0, 0.0, 1.0) - said by JJ
+    return sum;
 }
 
-// lab 5.1
+vec4 pass3()
+{
+    ivec2 pix= ivec2( gl_FragCoord.xy );
 
-/////////////////// Image Processing Techniques - Edge Detection ///////////////////
+    vec4 sum = texelFetch(Tex1, pix, 0) * Weight[0];
 
+    sum += texelFetchOffset( Tex1, pix, 0, ivec2(1, 0)) * Weight[1];
+    sum += texelFetchOffset( Tex1, pix, 0, ivec2(-1, 0)) * Weight[1];
+    sum += texelFetchOffset( Tex1, pix, 0, ivec2(2, 0)) * Weight[2];
+    sum += texelFetchOffset( Tex1, pix, 0, ivec2(-2, 0)) * Weight[2];
+    sum += texelFetchOffset( Tex1, pix, 0, ivec2(3, 0)) * Weight[3];
+    sum += texelFetchOffset( Tex1, pix, 0, ivec2(-3, 0)) * Weight[3];
+    sum += texelFetchOffset( Tex1, pix, 0, ivec2(4, 0)) * Weight[4]; 
+    sum += texelFetchOffset( Tex1, pix, 0, ivec2(-4, 0)) * Weight[4];
+    
+    return sum;
+}
+
+// lab 5.2
+
+/////////////////// Image Processing Techniques - Gaussian Blur ///////////////////
+
+// gaussian blur takes 3 pass()
 void main()
 {
-    // lab 5.1
+    // lab 5.2
 
     // an interesting way to do mode changing when rendering different buffers in model(s)
     // Pass in here refer to the level, similar as the lab 3.5 toon shading lab
     if (Pass == 1) FragColor = pass1();
-    if (Pass == 2) FragColor = pass2();
+    else if (Pass == 2) FragColor = pass2();
+    else if (Pass == 3) FragColor = pass3();
 
     // FragColor = vec4(phongModel(position, normalize(normal)), 1.0);
 
-    // lab 5.1
+    // lab 5.2
 }
