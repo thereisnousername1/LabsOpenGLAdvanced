@@ -1,4 +1,5 @@
 #version 460
+// go to OpenGL SuperBible p.426 (Ch9)
 
 ///
 /// In fragment shader
@@ -20,12 +21,13 @@ in vec3 position;
 // also maybe the type have to be the same as well
 //
 // actual texture to be imported from program
-
-// renamed from RenderTex in lab 5.1
-layout (binding = 0) uniform sampler2D Tex1; // refer to single texture rendering
+// layout (binding = 0) uniform sampler2D Tex1; // refer to single texture rendering
 
 // without binding = 0
-// uniform sampler2D RenderTex;
+// uniform sampler2D RenderTex; // in the lab standard solution it is called RenderTex
+                                // for my own study I will rename it as Tex,
+                                // so that I can compare it with Lab 5 solutions
+uniform sampler2D Tex;  // I named it Tex because all the sampler2D uniform in previous lab named Tex<number>
 
 // lab 5.1
 
@@ -69,7 +71,7 @@ vec3 phongModel (vec3 position, vec3 n)
 
     // combined the actual texture with the coordinate
     // to output the color of that texture
-    // vec3 texColor = texture(Tex1, TexCoord).rgb;
+    // vec3 texColor = texture(Tex, TexCoord).rgb;
 
 //// ambient lighting is a constant & omnipresent light source
     vec3 ambient = Light.La * Material.Ka;   // enabled since lab 5.1
@@ -153,10 +155,9 @@ vec3 phongModel (vec3 position, vec3 n)
 
 // lab 5.1
 
-uniform float EdgeThreshold;
+/// Edge Detection additional information ///
 
-// when the uniform pass in from outside, decide what logic it would perform
-uniform int Pass;
+uniform float EdgeThreshold;
 
 // Relative luminance, constant for the edge to glow 
 const vec3 lum = vec3(0.2126, 0.7152, 0.0722);
@@ -165,6 +166,11 @@ float luminance(vec3 color)
 {
     return dot(lum, color);
 }
+
+/// Edge Detection additional information ///
+
+// when the uniform pass in from outside, decide what logic it would perform
+uniform int Pass;
 
 // they return to FragColor and so they are vec4 function
 // edge detection needs 2 pass()
@@ -175,20 +181,20 @@ vec4 pass1()    // always the actual object rendering with lighting model
 
 vec4 pass2()
 {
-    ivec2 pix= ivec2(gl_FragCoord.xy); //we grab a pixel to check if edge
+    ivec2 pix = ivec2(gl_FragCoord.xy); //we grab a pixel to check if edge
 
     //pick neighbouring pixels for convolution filter
 
     //check lecture slides
 
-    float s00 = luminance(texelFetchOffset(Tex1, pix, 0, ivec2(-1, 1)).rgb);
-    float s10 = luminance(texelFetchOffset(Tex1, pix, 0, ivec2(-1, 0)).rgb);
-    float s20 = luminance(texelFetchOffset(Tex1, pix, 0, ivec2(-1, -1)).rgb);
-    float s01 = luminance(texelFetchOffset(Tex1, pix, 0, ivec2(0, 1)).rgb);
-    float s21 = luminance(texelFetchOffset(Tex1, pix, 0, ivec2(0, -1)).rgb);
-    float s02 = luminance(texelFetchOffset(Tex1, pix, 0, ivec2(1, 1)).rgb);
-    float s12 = luminance(texelFetchOffset(Tex1, pix, 0, ivec2(1, 0)).rgb);
-    float s22 = luminance(texelFetchOffset(Tex1, pix, 0, ivec2(1, -1)).rgb);
+    float s00 = luminance(texelFetchOffset( Tex, pix, 0, ivec2(-1, 1) ).rgb);
+    float s10 = luminance(texelFetchOffset( Tex, pix, 0, ivec2(-1, 0) ).rgb);
+    float s20 = luminance(texelFetchOffset( Tex, pix, 0, ivec2(-1, -1) ).rgb);
+    float s01 = luminance(texelFetchOffset( Tex, pix, 0, ivec2(0, 1) ).rgb);
+    float s21 = luminance(texelFetchOffset( Tex, pix, 0, ivec2(0, -1) ).rgb);
+    float s02 = luminance(texelFetchOffset( Tex, pix, 0, ivec2(1, 1) ).rgb);
+    float s12 = luminance(texelFetchOffset( Tex, pix, 0, ivec2(1, 0) ).rgb);
+    float s22 = luminance(texelFetchOffset( Tex, pix, 0, ivec2(1, -1) ).rgb);
 
     float sx = s00 + 2 * s10 + s20 - (s02 + 2 * s12 + s22);
     float sy = s00 + 2 * s01 + s02 - (s20 + 2 * s21 + s22);
@@ -199,7 +205,7 @@ vec4 pass2()
         return vec4(1.0); // edge
     else
         // return vec4(0.0, 0.0, 0.0, 1.0); // no edge
-        return texelFetch(Tex1, pix, 0);    // in the video this line is used instead
+        return texelFetch(Tex, pix, 0);    // in the video this line is used instead
         // same as vec4(0.0, 0.0, 0.0, 1.0) - said by JJ
 }
 
@@ -207,6 +213,7 @@ vec4 pass2()
 
 /////////////////// Image Processing Techniques - Edge Detection ///////////////////
 
+// edge detection takes 2 pass()
 void main()
 {
     // lab 5.1

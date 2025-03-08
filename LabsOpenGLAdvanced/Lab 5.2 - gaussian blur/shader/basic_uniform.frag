@@ -10,7 +10,7 @@
 in vec3 normal;
 in vec3 position;
 
-// lab 5.2
+// lab 5.1
 
 // according to https://blog.mmorpgtycoon.com/post/opengl-texture-inconsistent/
 // lets assume the binding word related to the "slot number" of a texture unit
@@ -20,10 +20,15 @@ in vec3 position;
 // also maybe the type have to be the same as well
 //
 // actual texture to be imported from program
+// layout (binding = 0) uniform sampler2D Tex1; // refer to single texture rendering
 
-layout (binding = 0) uniform sampler2D Tex1; // refer to single texture rendering
+// without binding = 0
+// uniform sampler2D RenderTex; // in the lab standard solution it is called RenderTex
+                                // for my own study I will rename it as Tex,
+                                // so that I can compare it with Lab 5 solutions
+uniform sampler2D Tex;  // I named it Tex because all the sampler2D uniform in previous lab named Tex<number>
 
-// lab 5.2
+// lab 5.1
 
 // Final Output
 layout (location = 0) out vec4 FragColor;
@@ -65,7 +70,7 @@ vec3 phongModel (vec3 position, vec3 n)
 
     // combined the actual texture with the coordinate
     // to output the color of that texture
-    // vec3 texColor = texture(Tex1, TexCoord).rgb;
+    // vec3 texColor = texture(Tex, TexCoord).rgb;
 
 //// ambient lighting is a constant & omnipresent light source
     vec3 ambient = Light.La * Material.Ka;   // enabled since lab 5.1
@@ -149,12 +154,14 @@ vec3 phongModel (vec3 position, vec3 n)
 
 // lab 5.2
 
-uniform float EdgeThreshold;
+/// Gaussian Blur additional information ///
+
+uniform float Weight[5];
+
+/// Gaussian Blur additional information ///
 
 // when the uniform pass in from outside, decide what logic it would perform
 uniform int Pass;
-
-uniform float Weight[5];
 
 // they return to FragColor and so they are vec4 function
 // edge detection needs 2 pass()
@@ -166,18 +173,18 @@ vec4 pass1()    // always the actual object rendering with lighting model
 
 vec4 pass2()
 {
-    ivec2 pix= ivec2( gl_FragCoord.xy );
+    ivec2 pix = ivec2( gl_FragCoord.xy );
 
-    vec4 sum = texelFetch(Tex1, pix, 0) * Weight[0];
+    vec4 sum = texelFetch( Tex, pix, 0 ) * Weight[0];
 
-    sum += texelFetchOffset( Tex1, pix, 0, ivec2(0, 1)) * Weight[1];
-    sum += texelFetchOffset( Tex1, pix, 0, ivec2(0, -1)) * Weight[1];
-    sum += texelFetchOffset( Tex1, pix, 0, ivec2(0, 2)) * Weight[2];
-    sum += texelFetchOffset( Tex1, pix, 0, ivec2(0, -2)) * Weight[2];
-    sum += texelFetchOffset( Tex1, pix, 0, ivec2(0, 3)) * Weight[3];
-    sum += texelFetchOffset( Tex1, pix, 0, ivec2(0, -3)) * Weight[3];
-    sum += texelFetchOffset( Tex1, pix, 0, ivec2(0, 4)) * Weight[4]; 
-    sum += texelFetchOffset( Tex1, pix, 0, ivec2(0, -4)) * Weight[4];
+    sum += texelFetchOffset( Tex, pix, 0, ivec2(0, 1)) * Weight[1];
+    sum += texelFetchOffset( Tex, pix, 0, ivec2(0, -1)) * Weight[1];
+    sum += texelFetchOffset( Tex, pix, 0, ivec2(0, 2)) * Weight[2];
+    sum += texelFetchOffset( Tex, pix, 0, ivec2(0, -2)) * Weight[2];
+    sum += texelFetchOffset( Tex, pix, 0, ivec2(0, 3)) * Weight[3];
+    sum += texelFetchOffset( Tex, pix, 0, ivec2(0, -3)) * Weight[3];
+    sum += texelFetchOffset( Tex, pix, 0, ivec2(0, 4)) * Weight[4]; 
+    sum += texelFetchOffset( Tex, pix, 0, ivec2(0, -4)) * Weight[4];
     
     return sum;
 }
@@ -186,16 +193,16 @@ vec4 pass3()
 {
     ivec2 pix= ivec2( gl_FragCoord.xy );
 
-    vec4 sum = texelFetch(Tex1, pix, 0) * Weight[0];
+    vec4 sum = texelFetch( Tex, pix, 0 ) * Weight[0];
 
-    sum += texelFetchOffset( Tex1, pix, 0, ivec2(1, 0)) * Weight[1];
-    sum += texelFetchOffset( Tex1, pix, 0, ivec2(-1, 0)) * Weight[1];
-    sum += texelFetchOffset( Tex1, pix, 0, ivec2(2, 0)) * Weight[2];
-    sum += texelFetchOffset( Tex1, pix, 0, ivec2(-2, 0)) * Weight[2];
-    sum += texelFetchOffset( Tex1, pix, 0, ivec2(3, 0)) * Weight[3];
-    sum += texelFetchOffset( Tex1, pix, 0, ivec2(-3, 0)) * Weight[3];
-    sum += texelFetchOffset( Tex1, pix, 0, ivec2(4, 0)) * Weight[4]; 
-    sum += texelFetchOffset( Tex1, pix, 0, ivec2(-4, 0)) * Weight[4];
+    sum += texelFetchOffset( Tex, pix, 0, ivec2(1, 0)) * Weight[1];
+    sum += texelFetchOffset( Tex, pix, 0, ivec2(-1, 0)) * Weight[1];
+    sum += texelFetchOffset( Tex, pix, 0, ivec2(2, 0)) * Weight[2];
+    sum += texelFetchOffset( Tex, pix, 0, ivec2(-2, 0)) * Weight[2];
+    sum += texelFetchOffset( Tex, pix, 0, ivec2(3, 0)) * Weight[3];
+    sum += texelFetchOffset( Tex, pix, 0, ivec2(-3, 0)) * Weight[3];
+    sum += texelFetchOffset( Tex, pix, 0, ivec2(4, 0)) * Weight[4]; 
+    sum += texelFetchOffset( Tex, pix, 0, ivec2(-4, 0)) * Weight[4];
     
     return sum;
 }
@@ -204,6 +211,7 @@ vec4 pass3()
 
 /////////////////// Image Processing Techniques - Gaussian Blur ///////////////////
 
+// edge detection takes 2 pass()
 // gaussian blur takes 3 pass()
 void main()
 {

@@ -60,15 +60,7 @@ void SceneBasic_Uniform::initScene()
 
     angle = glm::pi<float>() / 4.0f;
 
-    #pragma region (Light related) Light (diffuse, ambient, specular) intensity setting
-    
-    prog.setUniform("Light.Ld", vec3(1.0f));
-    prog.setUniform("Light.La", vec3(0.05f));
-    prog.setUniform("Light.Ls", vec3(1.0f));
-
-    #pragma endregion
-
-    setupFBO();
+    #pragma region Image Processing Techniques - Edge Detection
 
     // Array for full-screen quad
     GLfloat verts[] =
@@ -81,8 +73,6 @@ void SceneBasic_Uniform::initScene()
         0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
         0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f
     };
-
-    #pragma region Image Processing Techniques - Edge Detection
 
     // set up the buffers
     unsigned int handle[2];
@@ -107,12 +97,22 @@ void SceneBasic_Uniform::initScene()
     glBindVertexArray(0);
 
     //// Edge Detection ////
-    
+
     prog.setUniform("EdgeThreshold", 0.05f);
 
     //// Edge Detection ////
 
     #pragma endregion
+
+    #pragma region (Light related) Light (diffuse, ambient, specular) intensity setting
+    
+    prog.setUniform("Light.Ld", vec3(1.0f));
+    prog.setUniform("Light.La", vec3(0.05f));
+    prog.setUniform("Light.Ls", vec3(1.0f));
+
+    #pragma endregion
+
+    setupFBO();
 
     #pragma region (Disabled) Texture files linking
     
@@ -200,7 +200,7 @@ void SceneBasic_Uniform::update( float t )
 // this function now call other function(s) awaits to be executed in scene
 void SceneBasic_Uniform::render()
 {
-    // resizing won't work for this lab, because the area to render
+    // resizing won't work for this lab (lab 5.1), because the area to render
     // is defined in the beginning, initScene()
     // 
     // this is viewport resizing logic (I figure it out by myself)
@@ -208,29 +208,32 @@ void SceneBasic_Uniform::render()
     glfwGetFramebufferSize(glfwGetCurrentContext(), &viewportWidth, &viewportHeight);
     resize(viewportWidth, viewportHeight);
 
-    // glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);    // disabled since lab 5.1
-    // renderToTexture();                               // disabled since lab 5.1
+    // glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);    // similar logic combined into the pass() function instead
+    // renderToTexture();                               // renamed to pass1()
     pass1();
-    glFlush();  // flush the buffer and remove the texture loaded
+    glFlush();      // flush the buffer and remove the texture loaded
 
-    // glBindFramebuffer(GL_FRAMEBUFFER, 0);            // disabled since lab 5.1
-    // renderScene();                                   // disabled since lab 5.1
+    // glBindFramebuffer(GL_FRAMEBUFFER, 0);            // similar logic combined into the pass() function instead
+    // renderScene();                                   // renamed to pass2()
     pass2();
-    // glFlush();  // flush the buffer and remove the texture loaded    // disabled since lab 5.1
+    // glFlush();   // flush the buffer and remove the texture loaded    // disabled since lab 5.1
 }
 
-// this function stored the model / mesh / object declared and awaits to be detect with their edge
-// void SceneBasic_Uniform::render()    // renamed to renderToTexture()
+//// Try to compare each solution of Lab 5
+//// Their pass() functions looks similar
+
+// this function stored the model / mesh / object declared and will be handled with Phong model
 // void SceneBasic_Uniform::renderToTexture()   // renamed since lab 5.1
 void SceneBasic_Uniform::pass1()
 {
-    // prog.setUniform("RenderTex", 1); // replaced since lab 5.1
-    prog.setUniform("Pass", 1);
+    prog.setUniform("Pass", 1); // the pass() function will handle the sampler2D Tex in frag shader
     // glViewport(0, 0, 512, 512);      // disabled since lab 5.1
 
     // added since lab 5.1
     
-    glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
+    // glBindFramebuffer(GL_FRAMEBUFFER, renderFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);   // in the lab it is called renderFBO
+                                                    // for my own study I will rename it as fboHandle
     glEnable(GL_DEPTH_TEST);
 
     // added since lab 5.1
@@ -251,7 +254,6 @@ void SceneBasic_Uniform::pass1()
     // view = glm::lookAt(vec3(0.0f, 0.0f, 2.5f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));   // static camera position
     view = glm::lookAt(focus, vec3(0.0f, -0.1f, 0.0f), vec3(0.0f, 1.0f, 0.0f));  // camera x is starring at a point in the void, focus
 
-    // setting the aspect ratio for the cow mesh, effects is like zoom in
     //                                                  declared in scene.h
     projection = glm::perspective(glm::radians(60.0f), (float)width / height, 0.3f, 100.0f);
 
@@ -271,14 +273,14 @@ void SceneBasic_Uniform::pass1()
 
     //////////////////// First model(s) ////////////////////
 
-    prog.setUniform("Material.Kd", vec3(0.9f, 0.9f, 0.9f));     // enabled in lab 5.1
+    prog.setUniform("Material.Kd", vec3(0.9f, 0.9f, 0.9f));
     prog.setUniform("Material.Ks", vec3(0.95f, 0.95f, 0.95f));
-    prog.setUniform("Material.Ka", vec3(0.1f, 0.1f, 0.1f));     // enabled in lab 5.1
+    prog.setUniform("Material.Ka", vec3(0.1f, 0.1f, 0.1f));
     prog.setUniform("Material.shininess", 100.0f);
 
     model = mat4(1.0f);
 
-    model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));  // changed in lab 5.1
+    model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
     setMatrices();
     
     // mesh->render();
@@ -361,24 +363,23 @@ void SceneBasic_Uniform::pass1()
     #pragma endregion
 }
 
-// since this is edge detection, nothing except the edge is needed to draw in here
+// since this is edge detection, nothing except the edge is needed to draw in here (I just making guess)
 // void SceneBasic_Uniform::renderScene()   // renamed since lab 5.1
 void SceneBasic_Uniform::pass2()
 {
     // lab 5.1
 
-    // prog.setUniform("RenderTex", 1); // replaced since lab 5.1
-    prog.setUniform("Pass", 2);
+    prog.setUniform("Pass", 2); // the pass() function will handle the sampler2D Tex in frag shader
 
-    // Disabled since lab 5.1
-    // glViewport(0, 0, width, height);
+    // glViewport(0, 0, width, height); // Disabled since lab 5.1
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glActiveTexture(GL_TEXTURE0);
     // glBindTexture(GL_TEXTURE_2D, renderTex); // modified from lab sheet 5
-    glBindTexture(GL_TEXTURE_2D, Tex1);
+    glBindTexture(GL_TEXTURE_2D, fboTex);       // renamed as fboTex to match the naming style
 
-    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_DEPTH_TEST);   // the reason why the edge don't overlapped the model!!!
+                                // like it is the most important line in this lab
 
     // clear color buffer
     glClear(GL_COLOR_BUFFER_BIT);
@@ -392,6 +393,7 @@ void SceneBasic_Uniform::pass2()
     glBindVertexArray(fsQuad);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
+
     /* Disabled since lab 5.1
     /// Here it is single directional light, basic one
     // vec4 lightPos = vec4(0.0f, 10.0f, 0.0f, 1.0f);  // static position
@@ -463,39 +465,53 @@ void SceneBasic_Uniform::setMatrices()
     prog.setUniform("MVP", projection * mv);
 }
 
+// compare the setupFBO() in lab 4.8 and all solutions in lab 5
+
 // width, height are massively used in all lab 5 solutions
 // since setupFBO() is called in initScene()
 // the viewport settled always has fixed size
-void SceneBasic_Uniform::setupFBO()
+void SceneBasic_Uniform::setupFBO() // each image processing technique has unique setupFBO()
 {
+    ///// Necessary part /////
+
     // Generate and bind the framebuffer
-    glGenFramebuffers(1, &fboHandle);
-    glBindFramebuffer(GL_FRAMEBUFFER, fboHandle); 
+    // glGenFramebuffers(1, &renderFBO);
+    glGenFramebuffers(1, &fboHandle);               // in the lab it is called renderFBO
+                                                    // for my own study I will rename it as fboHandle
+
+    // glBindFramebuffer(GL_FRAMEBUFFER, renderFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);   // in the lab it is called renderFBO
+                                                    // for my own study I will rename it as fboHandle
 
     // Create the texture object
     // GLuint renderTex;    // moved to header since lab 5.1
-    // glGenTextures(1, &renderTex);            // renamed as Tex1
-    glGenTextures(1, &Tex1);
+    // glGenTextures(1, &renderTex);            
+    glGenTextures(1, &fboTex);              // renamed as fboTex to match the naming style
 
     // disabled since lab 5.1
     // glActiveTexture(GL_TEXTURE0); // Use texture unit0, thats why avoid using the same slot when init
     
-    // glBindTexture(GL_TEXTURE_2D, renderTex); // renamed as Tex1
-    glBindTexture(GL_TEXTURE_2D, Tex1);
+    // glBindTexture(GL_TEXTURE_2D, renderTex);
+    glBindTexture(GL_TEXTURE_2D, fboTex);   // renamed as fboTex to match the naming style
+
 
     // glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, 512, 512);    // replaced since lab 5.1
     glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);  // I don't see much difference by switching
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);  // between GL_LINEAR and GL_NEAREST
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);   // added since lab 5.1
     
     // Bind the texture to the FBO
-    // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTex, 0);   // renamed as Tex1
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Tex1, 0);
+    // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTex, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTex, 0); // renamed as fboTex to match the naming style
+
+    
+    /// Beginning of depth buffer ///
+
 
     // Create the depth buffer
-    GLuint depthBuf;
+    // GLuint depthBuf; // declared as global variable, go to header file
     glGenRenderbuffers(1, &depthBuf);
     glBindRenderbuffer(GL_RENDERBUFFER, depthBuf);
 
@@ -507,9 +523,13 @@ void SceneBasic_Uniform::setupFBO()
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, 
                               GL_RENDERBUFFER, depthBuf);
     
+    ///// Necessary part /////
+
     // Set the targets for the fragment output variables
     GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
     glDrawBuffers(1, drawBuffers);
+
+    /* Disabled since lab 5.1
     GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (result == GL_FRAMEBUFFER_COMPLETE) {
         std::cout << "Framebuffer is complete" << endl;
@@ -520,8 +540,8 @@ void SceneBasic_Uniform::setupFBO()
         std::cout << "Framebuffer error:" << result << endl;
 
     }
+    */
 
     // Unbind the framebuffer, and revert to default framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 }

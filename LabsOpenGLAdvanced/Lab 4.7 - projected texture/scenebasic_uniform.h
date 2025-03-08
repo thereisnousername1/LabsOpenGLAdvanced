@@ -40,7 +40,7 @@ private:
 
     Plane plane;    // enable since lab 4.7
 
-    GLuint Tex;   // single texture for lab 4.7
+    GLuint Tex;     // single texture to be render for lab 4.7
 
     Teapot teapot;
 

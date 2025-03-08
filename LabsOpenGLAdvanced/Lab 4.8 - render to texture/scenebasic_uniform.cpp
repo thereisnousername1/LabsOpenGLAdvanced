@@ -91,9 +91,9 @@ void SceneBasic_Uniform::initScene()
     // glActiveTexture(GL_TEXTURE0 + 1);    // this is used in lab solution
     // Order 2 :
     // pickup a texture unit that will keep affecting the whole program for to bind a texture to it
-    glActiveTexture(GL_TEXTURE0 + 1);
-    // glActiveTexture(GL_TEXTURE0);   // not really necessary, OpenGL can still bind without active anything
-                                       // that brought GL_TEXTURE0 texture unit (by default)
+    glActiveTexture(GL_TEXTURE0 + 1);   // in here a slot 1 will be the texture to render
+    // glActiveTexture(GL_TEXTURE0);   // mapped it with slot 0 will cause the texture rendered to
+                                       // the cube instead of the cow
 
     // assume the system somehow know it will send the texture binded in this texture unit 0
     // to somewhere in whatever shader with the "binding = 0"  in vertex
@@ -101,7 +101,8 @@ void SceneBasic_Uniform::initScene()
 
     // Order 3 :
     // the type of obj you want to declare as, obj to be bind
-    glBindTexture(GL_TEXTURE_2D, texID);
+    glBindTexture(GL_TEXTURE_2D, texID);    // I guess when a sampler2D read this in frag shader
+                                            // it knows the texture to be render and their slot no.
 
     #pragma endregion
 
@@ -152,7 +153,7 @@ void SceneBasic_Uniform::update( float t )
 
 }
 
-// this function stored model / mesh / object declared and awaits to be rendered in scene
+// this function now call other function(s) awaits to be executed in scene
 void SceneBasic_Uniform::render()
 {
     // Since the 2 objects is treated as, well separate 2 object
@@ -168,16 +169,29 @@ void SceneBasic_Uniform::render()
     renderToTexture();
     glFlush();  // flush the buffer and remove the texture loaded
 
+    // clear frame buffer binded above
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     renderScene();
     glFlush();  // flush the buffer and remove the texture loaded
 }
 
-// this function stored the mesh declared which looks like a cow and awaits to be rendered in scene
+// this function stored the mesh declared which looks like a cow and will be handled with Phong model
 // void SceneBasic_Uniform::render()    // renamed to renderToTexture()
 void SceneBasic_Uniform::renderToTexture()
 {
-    prog.setUniform("RenderTex", 1);
+    // refer to the sampler2D Tex in frag shader
+    // prog.setUniform("RenderTex", 1); // in the lab standard solution it is called RenderTex
+                                        // for my own study I will rename it as Tex,
+                                        // so that I can compare it with Lab 5 solutions
+    prog.setUniform("Tex", 1);  // from the explanation in initScene(), this probably means
+                                // called the sampler2D to render slot 1 item which contains
+                                // an image to render to
+                                // the obj in following logic, in this function it is the cow
+
+    // "Tex" in the fragment shader has no layout binding -> manual setting outside frag shader
+    // in the following solutions in lab 5 it will be driven by frame buffer within frag shader
+
     glViewport(0, 0, 512, 512);
 
     // clear color buffer and clear color & depth buffers
@@ -195,6 +209,8 @@ void SceneBasic_Uniform::renderToTexture()
 
     view = glm::lookAt(vec3(0.0f, 0.0f, 2.5f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));   // static camera position
     // view = glm::lookAt(focus, vec3(0.0f, -0.1f, 0.0f), vec3(0.0f, 1.0f, 0.0f));  // camera x is starring at a point in the void, focus
+
+    projection = glm::perspective(glm::radians(50.0f), 1.0f, 0.3f, 100.0f);
 
     // prog.setUniform("Light.Position", vec4(view * lightPos));   // Position of light was changing dynamically
     prog.setUniform("Light.Position", vec4(0.0f, 0.0f, 0.0f, 1.0f));   // lab 4.8
@@ -266,7 +282,15 @@ void SceneBasic_Uniform::renderToTexture()
 // this function stored the cube declared which is awaiting the spot to be rendered onto it and awaits to be rendered in scene
 void SceneBasic_Uniform::renderScene()
 {
-    prog.setUniform("RenderTex", 0);
+    // refer to the sampler2D Tex in frag shader
+    // prog.setUniform("RenderTex", 0); // in the lab standard solution it is called RenderTex
+                                        // for my own study I will rename it as Tex,
+                                        // so that I can compare it with Lab 5 solutions
+
+    prog.setUniform("Tex", 0);  // from the explanation in initScene(), this probably means
+                                // called the sampler2D to render slot 0 item which contains
+                                // ABSOLUTELY NOTHING to
+                                // the obj in following logic, in this function it is the cube
     //              declared in scene.h
     glViewport(0, 0, width, height);
 
@@ -336,30 +360,39 @@ void SceneBasic_Uniform::setMatrices()
     prog.setUniform("MVP", projection * mv);
 }
 
+// compare the setupFBO() in lab 4.8 and all solutions in lab 5
+
 void SceneBasic_Uniform::setupFBO()
 {
-    // from lab sheet 4 p.15
-
     // Generate and bind the framebuffer
     glGenFramebuffers(1, &fboHandle);
     glBindFramebuffer(GL_FRAMEBUFFER, fboHandle); 
 
     // Create the texture object
-    GLuint renderTex;
-    glGenTextures(1, &renderTex); 
+    // GLuint renderTex;
+    GLuint fboTex;                          // renamed as fboTex to match the naming style
+
+    // glGenTextures(1, &renderTex); 
+    glGenTextures(1, &fboTex);              // renamed as fboTex to match the naming style
+    
     glActiveTexture(GL_TEXTURE0); // Use texture unit0, thats why avoid using the same slot when init
-    glBindTexture(GL_TEXTURE_2D, renderTex);
+    
+    // glBindTexture(GL_TEXTURE_2D, renderTex);
+    glBindTexture(GL_TEXTURE_2D, fboTex);   // renamed as fboTex to match the naming style
+    
     glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, 512, 512);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     
     // Bind the texture to the FBO
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTex, 0);
+    // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTex, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTex, 0); // renamed as fboTex to match the naming style
 
-    // depth section
+
+    /// Beginning of depth buffer ///
     
-    // Create the depth buffer
 
+    // Create the depth buffer
     GLuint depthBuf;
     glGenRenderbuffers(1, &depthBuf);
     glBindRenderbuffer(GL_RENDERBUFFER, depthBuf);

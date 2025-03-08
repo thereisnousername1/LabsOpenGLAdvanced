@@ -24,25 +24,21 @@ using glm::mat4;
 // initialization of mainly 3D models in a scene happen in here, but well I don't care
 SceneBasic_Uniform::SceneBasic_Uniform() :
 
-    // lab 5.1
+    // lab 5.3
 
-    tPrev(0),  // added in lab 3.4, for spinning logic
-    angle(0.0f),
-    rotSpeed(glm::pi<float>() / 8.0f),
-    plane(50.0f, 50.0f, 1, 1),
+    // tPrev(0),                            // rotate no more since lab 5.3
+    // angle(0.0f),                         // rotate no more since lab 5.3
+    // rotSpeed(glm::pi<float>() / 8.0f),   // rotate no more since lab 5.3
+    plane(20.0f, 50.0f, 1, 1),              // modified since lab 5.3
     teapot(14, mat4(1.0f)),
-    torus(0.7f * 1.5f, 0.3f * 1.5f, 50, 50)
+    // torus(0.7f * 1.5f, 0.3f * 1.5f, 50, 50)  // replaced with sphere since lab 5.3
+    sphere(2.0f, 50, 50)
 
-    // lab 5.1
+    // lab 5.3
 {
     //                    relative file location in my computer            , bool center (according to the IDE)
     // mesh = ObjMesh::load("media/spot/spot_triangulated.obj");    // moved to initScene()
-    
-    // for instant gauss calculate with sigma2 changeable (Key I -> ++, K -> --)
-    temp = Scene::sigma2;   // sigma2 is declared in scene.h
 }
-
-float weights[5], sum;  // declared as global for instant gauss calculate
 
 // init(), initialization of everything in a scene happen in here
 // Light intensity setting to be placed in here (Well actually that does not matter at all, so as all setting to be import to shader)
@@ -50,7 +46,7 @@ void SceneBasic_Uniform::initScene()
 {
     compile();
 
-    // lab 5.2
+    // lab 5.3
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);   // modified since lab 5.2
 
@@ -63,9 +59,9 @@ void SceneBasic_Uniform::initScene()
 
     projection = mat4(1.0f);
 
-    angle = glm::pi<float>() / 4.0f;
+    // angle = glm::pi<float>() / 4.0f; // rotate no more since lab 5.3
 
-    #pragma region Image Processing Techniques - Gaussian Blur
+    #pragma region Image Processing Techniques - HDR with Tone Mapping
 
     // Array for full-screen quad
     GLfloat verts[] =
@@ -101,39 +97,37 @@ void SceneBasic_Uniform::initScene()
 
     glBindVertexArray(0);
 
-    //// Gaussian Blur ////
+    //// HDR with Tone Mapping ////
 
-    //                        this number decide the level of blur, BUT
-    //                        it works in a weird way, number too large / too small
-    //                        won't create huge impact
-    // float weights[5], sum, sigma2 = 8.0f;    // declared as global for instant gauss calculate
+    // I dunno seems there is nothing
 
-    //Compute and sum the weights
-    weights[0] = gauss(0.0f, sigma2);
-    sum = weights[0];
-
-    for (int i = 1; i < 5; i++) {
-        weights[i] = gauss(float(i), sigma2);
-        sum += 2 * weights[i];
-    }
-
-    //Normalize the weights and set the uniform
-    for (int i = 0; i < 5; i++) {
-        std::stringstream uniName;
-        uniName << "Weight[" << i << "]";
-        float val = weights[i] / sum;
-        prog.setUniform(uniName.str().c_str(), val);
-    }
-
-    //// Gaussian Blur ////
+    //// HDR with Tone Mapping ////
 
     #pragma endregion
 
     #pragma region (Light related) Light (diffuse, ambient, specular) intensity setting
     
-    prog.setUniform("Light.Ld", vec3(1.0f));
-    prog.setUniform("Light.La", vec3(0.05f));
-    prog.setUniform("Light.Ls", vec3(1.0f));
+    // turn to multiple directional lights[3] since lab 5.3
+
+    /// Disabled since lab 5.3
+    // prog.setUniform("Light.Ld", vec3(1.0f));
+    // prog.setUniform("Light.La", vec3(0.05f));
+    // prog.setUniform("Light.Ls", vec3(1.0f));
+
+    vec3 intense = vec3(5.0f);
+
+    prog.setUniform("lights[0].Ld", intense);
+    prog.setUniform("lights[0].Ls", intense);
+    prog.setUniform("lights[1].Ld", intense);
+    prog.setUniform("lights[1].Ls", intense);
+    prog.setUniform("lights[2].Ld", intense);
+    prog.setUniform("lights[2].Ls", intense);
+
+    intense = vec3(0.2f);
+
+    prog.setUniform("lights[0].La", intense);
+    prog.setUniform("lights[1].La", intense);
+    prog.setUniform("lights[2].La", intense);
 
     #pragma endregion
 
@@ -178,7 +172,7 @@ void SceneBasic_Uniform::initScene()
 
     #pragma endregion
     
-    // lab 5.2
+    // lab 5.3
 }
 
 void SceneBasic_Uniform::compile()
@@ -204,6 +198,7 @@ void SceneBasic_Uniform::update( float t )
 
     #pragma region lab 3.4 spinning logic
     
+    /* rotate no more since lab 5.3
     float deltaT = t - tPrev;
     if (tPrev == 0.0f) deltaT = 0.0f;
     tPrev = t;
@@ -221,40 +216,16 @@ void SceneBasic_Uniform::update( float t )
     }
 
     // lab 4.3
+    */
 
     #pragma endregion
-
-    // instant gauss calculate with sigma2 changeable (Key I -> ++, K -> --)
-    if (temp != sigma2)
-    {
-        //Compute and sum the weights
-        weights[0] = gauss(0.0f, sigma2);
-        sum = weights[0];
-
-        for (int i = 1; i < 5; i++) {
-            weights[i] = gauss(float(i), sigma2);
-            sum += 2 * weights[i];
-        }
-
-        //Normalize the weights and set the uniform
-        for (int i = 0; i < 5; i++) {
-            std::stringstream uniName;
-            uniName << "Weight[" << i << "]";
-            float val = weights[i] / sum;
-            prog.setUniform(uniName.str().c_str(), val);
-        }
-
-        temp = Scene::sigma2;
-    }
 
 }
 
 // this function now call other function(s) awaits to be executed in scene
 void SceneBasic_Uniform::render()
 {
-    // lab 5.2
-
-    // resizing will work this time (lab 5.2)
+    // resizing will work this time, but still not ideal
     // it regen the FBO when its necessary to
     // 
     // this is viewport resizing logic (I figure it out by myself)
@@ -266,16 +237,14 @@ void SceneBasic_Uniform::render()
         // setupFBO();
         resize(viewportWidth, viewportHeight);
     }
-
-    // lab 5.2
     
     pass1();
     // glFlush();  // flush the buffer and remove the texture loaded    // disabled since lab 5.2
 
+    computeLogAveLuminance();   // added since lab 5.3
+
     pass2();
     // glFlush();  // flush the buffer and remove the texture loaded    // disabled since lab 5.1
-
-    pass3();
 }
 
 //// Try to compare each solution of Lab 5
@@ -286,16 +255,19 @@ void SceneBasic_Uniform::render()
 void SceneBasic_Uniform::pass1()
 {
     prog.setUniform("Pass", 1); // the pass() function will handle the sampler2D Tex in frag shader
-    // glViewport(0, 0, 512, 512);      // disabled since lab 5.1
-
-    // added since lab 5.1
     
-    // glBindFramebuffer(GL_FRAMEBUFFER, renderFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);   // in the lab it is called renderFBO
+    // lab 5.3
+    
+    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);   // added since lab 5.3, may conflict with line 51
+
+    glViewport(0, 0, width, height); // enabled since lab 5.3
+
+    // glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);   // in the lab it is called hdrFBO
                                                     // for my own study I will rename it as fboHandle
     glEnable(GL_DEPTH_TEST);
 
-    // added since lab 5.1
+    // lab 5.3
 
     // clear color buffer and clear color & depth buffers
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -308,22 +280,26 @@ void SceneBasic_Uniform::pass1()
     // lab 4.8 - camera logic modified since lab 4.3
 
     // vec4 lightPos = vec4(10.0f * cos(angle), 10.0f, 10.0f * sin(angle), 1.0f);  // spinning rotation
-    vec3 focus = vec3(7.0f * cos(angle), 4.0f, 7.0f * sin(angle));  // lab 5.1, name is changed to cameraPos in lab
+    // vec3 focus = vec3(7.0f * cos(angle), 4.0f, 7.0f * sin(angle));  // lab 5.1, name is changed to cameraPos in lab
 
-    // view = glm::lookAt(vec3(0.0f, 0.0f, 2.5f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));   // static camera position
-    view = glm::lookAt(focus, vec3(0.0f, -0.1f, 0.0f), vec3(0.0f, 1.0f, 0.0f));  // camera x is starring at a point in the void, focus
+    view = glm::lookAt(vec3(2.0f, 0.0f, 14.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));   // static camera position
+    // view = glm::lookAt(focus, vec3(0.0f, -0.1f, 0.0f), vec3(0.0f, 1.0f, 0.0f));  // camera x is starring at a point in the void, focus
 
     //                                                  declared in scene.h
     projection = glm::perspective(glm::radians(60.0f), (float)width / height, 0.3f, 100.0f);
 
     // prog.setUniform("Light.Position", vec4(view * lightPos));   // Position of light was changing dynamically
-    prog.setUniform("Light.Position", vec4(0.0f, 0.0f, 0.0f, 1.0f));   // lab 4.8
+    // prog.setUniform("Light.Position", vec4(0.0f, 0.0f, 0.0f, 1.0f));   // disabled since multiple lights, lab 5.3
 
     // lab 4.8
 
     #pragma endregion
 
-    #pragma region (Material related) Multiple imported model setting section (Will be modified in numerous labs)
+    drawScene();
+
+    #pragma region (Disabled) (Material related) Multiple imported model setting section (Will be modified in numerous labs)
+
+    /* replaced with the drawScene()
 
     // the color and shininess setting of the material that mapped to the model
     // that going to be effected by the light(s) setting in the scene soon in shader(s)
@@ -426,79 +402,17 @@ void SceneBasic_Uniform::pass1()
 // void SceneBasic_Uniform::renderScene()   // renamed since lab 5.1
 void SceneBasic_Uniform::pass2()
 {
-    // lab 5.2
+    // lab 5.3
+    
+    prog.setUniform("Pass", 2);
 
-    prog.setUniform("Pass", 2); // the pass() function will handle the sampler2D Tex in frag shader
+    // revert to default framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    // glViewport(0, 0, width, height); // Disabled since lab 5.1
-
-    glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO); // modified since lab 5.2
-    glActiveTexture(GL_TEXTURE0);
-    // glBindTexture(GL_TEXTURE_2D, renderTex); // modified from lab sheet 5
-    glBindTexture(GL_TEXTURE_2D, fboTex);       // renamed as fboTex to match the naming style
+    // clear color buffer and depth buffer
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glDisable(GL_DEPTH_TEST);   // not sure what does it do, still necessary in the content
-
-    // clear color buffer
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    model = mat4(1.0f);
-    view = mat4(1.0f);
-    projection = mat4(1.0f);
-
-    setMatrices();
-
-    glBindVertexArray(fsQuad);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    // glBindVertexArray(0);    // disabled since lab 5.2, it doesn't seems have any difference
-    
-    /* Disabled since lab 5.1
-    /// Here it is single directional light, basic one
-    // vec4 lightPos = vec4(0.0f, 10.0f, 0.0f, 1.0f);  // static position
-
-    // lab 4.8 - camera logic modified since lab 4.3
-
-    // vec4 lightPos = vec4(10.0f * cos(angle), 10.0f, 10.0f * sin(angle), 1.0f);  // spinning rotation
-    vec3 focus = vec3(2.0f * cos(angle), 1.5f, 2.0f * sin(angle));  // lab 4.8, name is changed to cameraPos in lab
-
-    // view = glm::lookAt(vec3(0.0f, 0.0f, 2.5f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));   // static camera position
-    view = glm::lookAt(focus, vec3(0.0f, -0.1f, 0.0f), vec3(0.0f, 1.0f, 0.0f));  // camera x is starring at a point in the void, focus
-
-    // setting the aspect ratio for the cow mesh, effects is like zoom in
-    //                                                  declared in scene.h
-    projection = glm::perspective(glm::radians(45.0f), (float)width / height, 0.3f, 100.0f);
-
-    // prog.setUniform("Light.Position", vec4(view * lightPos));   // Position of light was changing dynamically
-    prog.setUniform("Light.Position", vec4(0.0f, 0.0f, 0.0f, 1.0f));   // lab 4.8
-
-    // prog.setUniform("Material.Kd", vec3(0.2f, 0.55f, 0.9f));                         // disabled in lab 4.8
-    prog.setUniform("Material.Ks", vec3(0.0f, 0.0f, 0.0f));
-    // prog.setUniform("Material.Ka", vec3(0.2f * 0.3f, 0.55f * 0.3f, 0.9f * 0.3f));    // disabled in lab 4.8
-    prog.setUniform("Material.shininess", 1.0f);
-
-    model = mat4(1.0f);
-
-    setMatrices();
-
-    cube.render();  // the cube here has its own texture, and the cow is the object to render onto the cube
-                    // without prper texture mapping they looks like they are overlapped
-    */
-
-    // lab 5.2
-}
-
-// I don't know what is the specific duty of this function
-void SceneBasic_Uniform::pass3()
-{
-    prog.setUniform("Pass", 3);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glActiveTexture(GL_TEXTURE0);
-
-    glBindTexture(GL_TEXTURE_2D, intermediateTex);
-
-    // clear color buffer
-    glClear(GL_COLOR_BUFFER_BIT);
 
     model = mat4(1.0f);
     view = mat4(1.0f);
@@ -509,11 +423,70 @@ void SceneBasic_Uniform::pass3()
     // Render the full-screen quad
     glBindVertexArray(fsQuad);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    // lab 5.3
+}
+
+void SceneBasic_Uniform::drawScene()
+{
+    vec3 intense = vec3(1.0f);
+
+    prog.setUniform("lights[0].Ld", intense);
+    prog.setUniform("lights[0].Ls", intense);
+    prog.setUniform("lights[1].Ld", intense);
+    prog.setUniform("lights[1].Ls", intense);
+    prog.setUniform("lights[2].Ld", intense);
+    prog.setUniform("lights[2].Ls", intense);
+
+    vec4 lightPos = vec4(0.0f, 4.0f, 2.5f, 1.0f);
+
+    lightPos.x = -7.0f;
+    prog.setUniform("lights[0].Position", view * lightPos);
+
+    lightPos.x = 0.0f;
+    prog.setUniform("lights[1].Position", view * lightPos);
+
+    lightPos.x = 7.0f;
+    prog.setUniform("lights[2].Position", view * lightPos);
+
+    prog.setUniform("Material.Kd", vec3(0.9f, 0.3f, 0.2f));
+    prog.setUniform("Material.Ks", vec3(1.0f, 1.0f, 1.0f));
+    prog.setUniform("Material.Ka", vec3(0.2f, 0.2f, 0.2f));
+    prog.setUniform("Material.shininess", 100.0f);
+
+    model = mat4(1.0f);
+
+    // The backdrop plane
+    model = glm::rotate(mat4(1.0f), glm::radians(90.0f), vec3(1.0f, 0.0f, 0.0f));
+    setMatrices();
+    plane.render();
+
+    // The bottom plane
+    model = glm::translate(mat4(1.0f), vec3(0.0f, -5.0f, 0.0f));
+    setMatrices();
+    plane.render();
+
+    // Top plane
+    model = glm::translate(mat4(1.0f), vec3(0.0f, 5.0f, 0.0f));
+    model = glm::rotate(model, glm::radians(180.0f), vec3(1.0f, 0.0f, 0.0f));
+    setMatrices();
+    plane.render();
+
+    // Sphere
+    prog.setUniform("Material.Kd", vec3(0.4f, 0.9f, 0.4f));
+    model = glm::translate(mat4(1.0f), vec3(-3.0f, -3.0f, 2.0f));
+    setMatrices();
+    sphere.render();
+
+    // Teapot
+    prog.setUniform("Material.Kd", vec3(0.4f, 0.4f, 0.9f));
+    model = glm::translate(mat4(1.0f), vec3(3.0f, -5.0f, 1.5f));
+    model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
+    setMatrices();
+    teapot.render();
 }
 
 #pragma endregion
-
-// lab 5.2
 
 // unlikely to be edit very often
 void SceneBasic_Uniform::resize(int w, int h)
@@ -532,8 +505,6 @@ void SceneBasic_Uniform::resize(int w, int h)
     projection = glm::perspective(glm::radians(70.0f), (float)w / h, 0.3f, 100.0f);
 
 }
-
-// lab 5.2
 
 // to be called for rendering 3d models, unlikely to be edit very often
 void SceneBasic_Uniform::setMatrices()
@@ -556,42 +527,42 @@ void SceneBasic_Uniform::setMatrices()
 // width, height are massively used in all lab 5 solutions
 // since setupFBO() is called in initScene()
 // the viewport settled always has fixed size, but you can always do setupFBO()
-// and now the viewport is adjustable
+// so now the viewport is adjustable
 void SceneBasic_Uniform::setupFBO() // each image processing technique has unique setupFBO()
 {
     ///// Necessary part /////
 
     // Generate and bind the framebuffer
-    // glDeleteFramebuffers(1, &renderFBO);         // Deallocate to free the slot
-    // glGenFramebuffers(1, &renderFBO);
-    glGenFramebuffers(1, &fboHandle);               // in the lab it is called renderFBO
+    // glDeleteFramebuffers(1, &hdrFBO);            // Deallocate to free the slot
+    // glGenFramebuffers(1, &hdrFBO);
+    glGenFramebuffers(1, &fboHandle);               // in lab 5.3 it is called hdrFBO
                                                     // for my own study I will rename it as fboHandle
 
-    // glBindFramebuffer(GL_FRAMEBUFFER, renderFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);   // in the lab it is called renderFBO
+    // glBindFramebuffer(GL_FRAMEBUFFER, hdrFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);   // in lab 5.3 it is called hdrFBO
                                                     // for my own study I will rename it as fboHandle
 
     // Create the texture object
-    // GLuint renderTex;    // moved to header since lab 5.1
-    // glGenTextures(1, &renderTex);
-    // glDeleteTextures(1, &renderTex);             // Deallocate to free the slot
-    glGenTextures(1, &fboTex);              // renamed as fboTex to match the naming style
+    // glGenTextures(1, &hdrTex);
+    // glDeleteTextures(1, &hdrTex);                // Deallocate to free the slot
+    glGenTextures(1, &fboTex);                      // in lab 5.3 it is called hdrTex
+                                                    // for my own study I will rename it as fboTex
 
-    // disabled since lab 5.1
-    // glActiveTexture(GL_TEXTURE0); // Use texture unit0, thats why avoid using the same slot when init
+    // enabled since lab 5.3
+    glActiveTexture(GL_TEXTURE0); // Use texture unit0, thats why avoid using the same slot when init
     
     // glBindTexture(GL_TEXTURE_2D, renderTex);
     glBindTexture(GL_TEXTURE_2D, fboTex);   // renamed as fboTex to match the naming style
 
-    // glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, 512, 512);    // replaced since lab 5.1
-    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
+    // glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);   // replaced since lab 5.3
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB32F, width, height);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);  // different from lab 5.1
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);  // different from lab 5.1
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);     // disabled since lab 5.3
     
     // Bind the texture to the FBO
-    // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderTex, 0);
+    // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, hdrTex, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTex, 0); // renamed as fboTex to match the naming style
     
 
@@ -615,69 +586,55 @@ void SceneBasic_Uniform::setupFBO() // each image processing technique has uniqu
     ///// Necessary part /////
 
     // Set the targets for the fragment output variables
-    GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
-    glDrawBuffers(1, drawBuffers);
-
-    // Unbind the framebuffer, and revert to default framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    ///// Gaussian Blur /////
-
-    // Generate and bind the framebuffer
-    // glDeleteFramebuffers(1, &intermediateFBO);   // Deallocate to free the slot
-    glGenFramebuffers(1, &intermediateFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
-
-    // Create the texture object
-    // glDeleteTextures(1, &intermediateTex);       // Deallocate to free the slot
-    glGenTextures(1, &intermediateTex);
-
-    glActiveTexture(GL_TEXTURE0);   // Use texture unit 0
-
-    glBindTexture(GL_TEXTURE_2D, intermediateTex);
-
-    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-
-    // Bind the texture to the FBO
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, intermediateTex, 0);
+    // GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 }; // replaced since lab 5.3 
+    GLenum drawBuffers[] = { GL_NONE, GL_COLOR_ATTACHMENT0 };
     
-    // No depth buffer needed for this FBO
-
-    // Set the targets for the fragment output variables
-    glDrawBuffers(1, drawBuffers);
+    // glDrawBuffers(1, drawBuffers);                   // replaced since lab 5.3
+    glDrawBuffers(2, drawBuffers);
 
     // Unbind the framebuffer, and revert to default framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    ///// Gaussian Blur /////
 }
 
-// lab 5.2
+// lab 5.3
 
 // this is self-made deallocator, it serve for one reason
 // to free the slots and save some memory (at least I hope it can)
 // it is called when you need to resize the viewport
 void SceneBasic_Uniform::byeFBO()   // each glDelete... correspond to each glGen...
 {
-    // glDeleteFramebuffers(1, &renderFBO); // in the lab it is called renderFBO
+    // glDeleteFramebuffers(1, &hdrFBO);    // in the lab it is called hdrFBO
                                             // for my own study I will rename it as fboHandle
     glDeleteFramebuffers(1, &fboHandle);
+
+    // glDeleteTextures(1, &hdrTex);        // in the lab it is called hdrTex
+                                            // for my own study I will rename it as fboTex
     glDeleteTextures(1, &fboTex);
     glDeleteRenderbuffers(1, &depthBuf);
-    glDeleteFramebuffers(1, &intermediateFBO);
-    glDeleteTextures(1, &intermediateTex);
 }
 
-// being called since initScene()
-float SceneBasic_Uniform::gauss(float x, float sigma2)
+void SceneBasic_Uniform::computeLogAveLuminance()
 {
-    double coeff = 1.0 / (glm::two_pi<double>() * sigma2);
-    double expon = -(x * x) / (2.0 * sigma2);
-    return (float)(coeff * exp(expon));
+    int size = width * height;
+    std::vector<GLfloat> texData(size * 3);
+    glActiveTexture(GL_TEXTURE0);
+
+    // glBindTexture(GL_TEXTURE_2D, hdrTex);
+    glBindTexture(GL_TEXTURE_2D, fboTex);   // renamed in current context
+
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGB, GL_FLOAT, texData.data());
+    
+    float sum = 0.0f;
+    for (int i = 0; i < size; i++) {
+
+        float lum = glm::dot(vec3(texData[i * 3 + 0],
+                                  texData[i * 3 + 1],
+                                  texData[i * 3 + 2]),
+                             vec3(0.2126f, 0.7152f, 0.0722f));
+        sum += logf(lum + 0.00001f);
+    }
+
+    prog.setUniform("AveLum", expf(sum / size));
 }
 
-// lab 5.2
+// lab 5.3

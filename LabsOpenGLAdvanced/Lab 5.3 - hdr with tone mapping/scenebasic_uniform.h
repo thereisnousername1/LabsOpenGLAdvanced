@@ -1,4 +1,3 @@
-//////////////////// lab 4.8 is taken from lab 4.1 single texture ////////////////////
 #ifndef SCENEBASIC_UNIFORM_H
 #define SCENEBASIC_UNIFORM_H
 
@@ -11,12 +10,8 @@
 #include "helper/teapot.h"
 #include "helper/plane.h"
 #include "helper/objmesh.h"
-
-// lab 4 related
-
 #include "helper/cube.h"
-
-// lab 4 related
+#include "helper/sphere.h"
 
 // SceneBasic_Uniform is a subclass of the Scene class
 class SceneBasic_Uniform : public Scene
@@ -25,27 +20,30 @@ private:
 
     int viewportWidth, viewportHeight;
 
+    // lab 5.3
+
     GLSLProgram prog;
 
-    float angle;    // enabled in lab 3.4, works with tPrev
+    // float angle; // rotate no more since lab 5.3
 
     glm::mat4 mv;
-
-    // lab 4.8
     
     // std::unique_ptr<ObjMesh> spot;
-    std::unique_ptr<ObjMesh> mesh;  // enabled since lab 4.8, renamed to spot in video
+    // std::unique_ptr<ObjMesh> mesh;  // disabled since lab 5.1, renamed to spot in video
 
-    // Torus torus;
-    // Plane plane;
-    // Teapot teapot;
+    // Torus torus; // replaced with sphere since lab 5.3
+    Sphere sphere;  // added since lab 5.3
 
-    Cube cube;
+    Plane plane;    // enabled since lab 5.1
+    Teapot teapot;  // enabled since lab 5.1
 
-    float rotSpeed;     // added with lab 4.7 viewer logic
+    // Cube cube;
 
-    GLuint fboHandle;   // added since lab 4.8, to be handled with prog.setUniform(<name of the sampler2D>, 1)
-                        // while 1 refer to the cow texture 
+    // float rotSpeed;  // rotate no more since lab 5.3
+
+    // renamed fboTex from RenderTex to match the naming style since lab 5.1
+    GLuint fsQuad, fboHandle, fboTex;           // basics requires for image processing (setupFBO())
+    GLuint depthBuf;                            // depth logic related, also requires for edge detection
 
     //// Brief logic explanation ////
     // 
@@ -63,23 +61,27 @@ private:
     // 
     //// Brief logic explanation ////
 
-    // lab 4.8
-
-    float tPrev;    // spinning logic related
+    // float tPrev; // rotate no more since lab 5.3
 
     void setMatrices();
 
     void compile();
-
-    // lab 4.8
     
     void setupFBO();
 
-    void renderToTexture();
+    void byeFBO();
 
-    void renderScene();
+    // void renderToTexture();
+    void pass1();   // renamed since lab 5.1
 
-    // lab 4.8
+    // void renderScene();
+    void pass2();   // renamed since lab 5.1
+
+    void computeLogAveLuminance();
+
+    void drawScene();
+
+    // lab 5.3
 
 public:
     SceneBasic_Uniform();
