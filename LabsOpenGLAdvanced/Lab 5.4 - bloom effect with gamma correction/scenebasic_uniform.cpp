@@ -24,21 +24,26 @@ using glm::mat4;
 // initialization of mainly 3D models in a scene happen in here, but well I don't care
 SceneBasic_Uniform::SceneBasic_Uniform() :
 
-    // lab 5.3
+    // lab 5.4
 
-    // tPrev(0),                            // rotate no more since lab 5.3
-    // angle(0.0f),                         // rotate no more since lab 5.3
-    // rotSpeed(glm::pi<float>() / 8.0f),   // rotate no more since lab 5.3
+    tPrev(0),                           // rotate again since lab 5.4
+    angle(0.0f),                        // rotate again since lab 5.4
+    rotSpeed(glm::pi<float>() / 8.0f),  // rotate again since lab 5.4
     plane(20.0f, 50.0f, 1, 1),              // modified since lab 5.3
     teapot(14, mat4(1.0f)),
     // torus(0.7f * 1.5f, 0.3f * 1.5f, 50, 50)  // replaced with sphere since lab 5.3
     sphere(2.0f, 50, 50)
 
-    // lab 5.3
+    // lab 5.4
 {
     //                    relative file location in my computer            , bool center (according to the IDE)
     // mesh = ObjMesh::load("media/spot/spot_triangulated.obj");    // moved to initScene()
+
+    // for instant gauss calculate with sigma2 changeable (Key I -> ++, K -> --)
+    temp = Scene::sigma2;   // sigma2 is declared in scene.h
 }
+
+float weights[10], sum;  // declared as global for instant gauss calculate
 
 // init(), initialization of everything in a scene happen in here
 // Light intensity setting to be placed in here (Well actually that does not matter at all, so as all setting to be import to shader)
@@ -46,9 +51,9 @@ void SceneBasic_Uniform::initScene()
 {
     compile();
 
-    // lab 5.3
+    // lab 5.4
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);   // modified since lab 5.2
+    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);   // added since lab 5.3
 
     glEnable(GL_DEPTH_TEST);
 
@@ -59,9 +64,10 @@ void SceneBasic_Uniform::initScene()
 
     projection = mat4(1.0f);
 
-    // angle = glm::pi<float>() / 4.0f; // rotate no more since lab 5.3
+    // angle = glm::pi<float>() / 4.0f; // rotate again since lab 5.4
+    angle = glm::pi<float>() / 2.0f;
 
-    #pragma region Image Processing Techniques - HDR with Tone Mapping
+    #pragma region Image Processing Techniques - Bloom Effect with Gamma Correction (based on HDR)
 
     // Array for full-screen quad
     GLfloat verts[] =
@@ -97,11 +103,78 @@ void SceneBasic_Uniform::initScene()
 
     glBindVertexArray(0);
 
-    //// HDR with Tone Mapping ////
+    //// Bloom Effect with Gamma Correction (based on HDR) ////
 
-    // I dunno seems there is nothing
 
-    //// HDR with Tone Mapping ////
+    // Lab 5.1
+    //// Edge Detection ////
+
+    // prog.setUniform("EdgeThreshold", 0.05f); // renamed and modified in current context
+    prog.setUniform("LumThreash", 1.7f);
+
+    //// Edge Detection ////
+
+
+    // Lab 5.2
+    //// Gaussian Blur ////
+
+    //                        this number decide the level of blur, BUT
+    //                        it works in a weird way, number too large / too small
+    //                        won't create huge impact
+    // float weights[5], sum, sigma2 = 25.0f;    // declared as global for instant gauss calculate, sigma2 was 8.0f
+
+    //Compute and sum the weights
+    weights[0] = gauss(0.0f, sigma2);
+    sum = weights[0];
+
+    // for (int i = 1; i < 5; i++) {
+    for (int i = 1; i < 10; i++) {              // Modified since 5.4
+        weights[i] = gauss(float(i), sigma2);
+        sum += 2 * weights[i];
+    }
+
+    //Normalize the weights and set the uniform
+    // for (int i = 0; i < 5; i++) {            // Modified since 5.4
+    for (int i = 0; i < 10; i++) {
+        std::stringstream uniName;
+        uniName << "Weight[" << i << "]";
+        float val = weights[i] / sum;
+        prog.setUniform(uniName.str().c_str(), val);
+    }
+
+    //// Gaussian Blur ////
+
+
+
+    // Set up two sampler objects for linear and nearest filtering
+    GLuint samplers[2];
+    glGenSamplers(2, samplers);
+    linearSampler = samplers[0];
+    nearestSampler = samplers[1];
+    GLfloat border[] = { 0.0f,0.0f,0.0f,0.0f };
+
+    // Set up the nearest sampler
+    glSamplerParameteri(nearestSampler, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glSamplerParameteri(nearestSampler, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glSamplerParameteri(nearestSampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glSamplerParameteri(nearestSampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glSamplerParameterfv(nearestSampler, GL_TEXTURE_BORDER_COLOR, border);
+
+    // Set up the linear sampler
+    glSamplerParameteri(linearSampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glSamplerParameteri(linearSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glSamplerParameteri(linearSampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glSamplerParameterfv(linearSampler, GL_TEXTURE_BORDER_COLOR, border);
+
+    // We want nearest sampling except for the last pass.
+    glBindSampler(0, nearestSampler);
+    glBindSampler(1, nearestSampler);
+    glBindSampler(2, nearestSampler);
+
+    prog.setUniform("Gamma", Scene::Gamma);
+
+    //// Bloom Effect with Gamma Correction (based on HDR) ////
 
     #pragma endregion
 
@@ -114,7 +187,8 @@ void SceneBasic_Uniform::initScene()
     // prog.setUniform("Light.La", vec3(0.05f));
     // prog.setUniform("Light.Ls", vec3(1.0f));
 
-    vec3 intense = vec3(5.0f);
+    // vec3 intense = vec3(5.0f);   // modified from lab 5.3
+    vec3 intense = vec3(0.6f);
 
     prog.setUniform("lights[0].Ld", intense);
     prog.setUniform("lights[0].Ls", intense);
@@ -172,7 +246,7 @@ void SceneBasic_Uniform::initScene()
 
     #pragma endregion
     
-    // lab 5.3
+    // lab 5.4
 }
 
 void SceneBasic_Uniform::compile()
@@ -198,7 +272,7 @@ void SceneBasic_Uniform::update( float t )
 
     #pragma region lab 3.4 spinning logic
     
-    /* rotate no more since lab 5.3
+    // rotate again since lab 5.4
     float deltaT = t - tPrev;
     if (tPrev == 0.0f) deltaT = 0.0f;
     tPrev = t;
@@ -216,9 +290,34 @@ void SceneBasic_Uniform::update( float t )
     }
 
     // lab 4.3
-    */
 
     #pragma endregion
+
+    // instant gauss calculate with sigma2 changeable (Key I -> ++, K -> --)
+    if (temp != sigma2)
+    {
+        //Compute and sum the weights
+        weights[0] = gauss(0.0f, sigma2);
+        sum = weights[0];
+
+        for (int i = 1; i < 10; i++) {
+            weights[i] = gauss(float(i), sigma2);
+            sum += 2 * weights[i];
+        }
+
+        //Normalize the weights and set the uniform
+        for (int i = 0; i < 10; i++) {
+            std::stringstream uniName;
+            uniName << "Weight[" << i << "]";
+            float val = weights[i] / sum;
+            prog.setUniform(uniName.str().c_str(), val);
+        }
+
+        temp = Scene::sigma2;
+    }
+
+    // Gamma changeable (Key O -> ++, L -> --)
+    prog.setUniform("Gamma", Scene::Gamma);
 
 }
 
@@ -245,6 +344,12 @@ void SceneBasic_Uniform::render()
 
     pass2();
     // glFlush();  // flush the buffer and remove the texture loaded    // disabled since lab 5.1
+
+    pass3();
+    
+    pass4();
+
+    pass5();
 }
 
 //// Try to compare each solution of Lab 5
@@ -252,13 +357,11 @@ void SceneBasic_Uniform::render()
 
 // this function stored the model / mesh / object declared and will be handled with Phong model
 // void SceneBasic_Uniform::renderToTexture()   // renamed since lab 5.1
-void SceneBasic_Uniform::pass1()
+void SceneBasic_Uniform::pass1()    // Render pass function
 {
     prog.setUniform("Pass", 1);
     
-    // lab 5.3
-    
-    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);   // added since lab 5.3, may conflict with line 51
+    // lab 5.4
 
     glViewport(0, 0, width, height); // enabled since lab 5.3
 
@@ -267,7 +370,7 @@ void SceneBasic_Uniform::pass1()
                                                     // for my own study I will rename it as fboHandle
     glEnable(GL_DEPTH_TEST);
 
-    // lab 5.3
+    // lab 5.4
 
     // clear color buffer and clear color & depth buffers
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -280,7 +383,7 @@ void SceneBasic_Uniform::pass1()
     // lab 4.8 - camera logic modified since lab 4.3
 
     // vec4 lightPos = vec4(10.0f * cos(angle), 10.0f, 10.0f * sin(angle), 1.0f);  // spinning rotation
-    // vec3 focus = vec3(7.0f * cos(angle), 4.0f, 7.0f * sin(angle));  // lab 5.1, name is changed to cameraPos in lab
+    vec3 focus = vec3(7.0f * cos(angle), 4.0f, 7.0f * sin(angle));  // lab 5.1, name is changed to cameraPos in lab
 
     view = glm::lookAt(vec3(2.0f, 0.0f, 14.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));   // static camera position
     // view = glm::lookAt(focus, vec3(0.0f, -0.1f, 0.0f), vec3(0.0f, 1.0f, 0.0f));  // camera x is starring at a point in the void, focus
@@ -398,21 +501,28 @@ void SceneBasic_Uniform::pass1()
     #pragma endregion
 }
 
-// I don't know what is the specific duty of this function
-// void SceneBasic_Uniform::renderScene()   // renamed since lab 5.1
-void SceneBasic_Uniform::pass2()
+// former Lab 5.2 gaussian blur SceneBasic_Uniform::pass2()
+void SceneBasic_Uniform::pass2()    // Bright pass function
 {
-    // lab 5.3
-    
     prog.setUniform("Pass", 2);
 
-    // revert to default framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);         // renamed to match current context
 
-    // clear color buffer and depth buffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // lab 5.4
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_2D, intermediateTex1, 0); // renamed to match current context
+
+    glViewport(0, 0, bloomBufWidth, bloomBufHeight);
+
+    glClearColor(0, 0, 0, 0);
+
+    // lab 5.4
 
     glDisable(GL_DEPTH_TEST);   // not sure what does it do, still necessary in the content
+
+    // clear color buffer
+    glClear(GL_COLOR_BUFFER_BIT);
 
     model = mat4(1.0f);
     view = mat4(1.0f);
@@ -423,8 +533,62 @@ void SceneBasic_Uniform::pass2()
     // Render the full-screen quad
     glBindVertexArray(fsQuad);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    // glBindVertexArray(0);    // disabled since lab 5.2, it doesn't seems have any difference
+}
 
-    // lab 5.3
+// new pass() only in lab 5.4
+void SceneBasic_Uniform::pass3()    // First blur pass function
+{
+    prog.setUniform("Pass", 3);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_2D, intermediateTex2, 0); // renamed to match current context
+
+    // Render the full-screen quad
+    glBindVertexArray(fsQuad);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+// new pass() only in lab 5.4
+void SceneBasic_Uniform::pass4()    // Second blur pass function
+{
+    prog.setUniform("Pass", 4);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_2D, intermediateTex1, 0); // renamed to match current context
+
+    // Render the full-screen quad
+    glBindVertexArray(fsQuad);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+// new pass() only in lab 5.4
+void SceneBasic_Uniform::pass5()    // Composite pass function
+{
+    prog.setUniform("Pass", 5);
+
+    // Bind to the default framebuffer, this time we're going to
+    // actually draw to the screen!
+
+    // revert to default framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // clear color buffer
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glViewport(0, 0, width, height);
+
+    // In this pass, we're reading from tex1 (unit 1) and we want
+    // linear sampling to get an extra blur
+
+    glBindSampler(1, linearSampler);
+
+    // Render the full-screen quad
+    glBindVertexArray(fsQuad);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    // revert to nearest sampling
+    glBindSampler(1, nearestSampler);
 }
 
 void SceneBasic_Uniform::drawScene()
@@ -557,13 +721,14 @@ void SceneBasic_Uniform::setupFBO() // each image processing technique has uniqu
     // glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);   // replaced since lab 5.3
     glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB32F, width, height);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);   // disabled since lab 5.4
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);   // disabled since lab 5.4
     // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);     // disabled since lab 5.3
     
     // Bind the texture to the FBO
     // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, hdrTex, 0);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTex, 0); // renamed as fboTex to match the naming style
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_2D, fboTex, 0); // renamed as fboTex to match the naming style
     
 
     /// Beginning of depth buffer ///
@@ -586,17 +751,66 @@ void SceneBasic_Uniform::setupFBO() // each image processing technique has uniqu
     ///// Necessary part /////
 
     // Set the targets for the fragment output variables
-    // GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 }; // replaced since lab 5.3 
-    GLenum drawBuffers[] = { GL_NONE, GL_COLOR_ATTACHMENT0 };
+    GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0 };
+    // GLenum drawBuffers[] = { GL_NONE, GL_COLOR_ATTACHMENT0 };    // replaced since lab 5.4
     
-    // glDrawBuffers(1, drawBuffers);                   // replaced since lab 5.3
-    glDrawBuffers(2, drawBuffers);
+    glDrawBuffers(1, drawBuffers);
+    // glDrawBuffers(2, drawBuffers);                               // replaced since lab 5.4
+
+
+
+    ///// Bloom Effect with Gamma Correction (based on HDR) /////
+
+    // Create an FBO for the bright-pass filter and blur
+    // glGenFramebuffers(1, &blurFbo);              // renamed in current context
+    // glDeleteFramebuffers(1, &blurFbo);           // deallocate
+    glGenFramebuffers(1, &intermediateFBO);
+
+    // glBindFramebuffer(GL_FRAMEBUFFER, blurFbo);  // renamed in current context
+    glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+
+    // Create two texture objects to ping-pong for the bright-pass filter
+    // and the two-pass blur
+    bloomBufWidth = width / 8;
+    bloomBufHeight = height / 8;
+
+    // glGenTextures(1, &tex1);                     // renamed in current context
+    // glDeleteTextures(1, &tex1);                  // deallocate
+    glGenTextures(1, &intermediateTex1);
+
+    glActiveTexture(GL_TEXTURE1);
+
+    // glBindTexture(GL_TEXTURE_2D, tex1);          // renamed in current context
+    glBindTexture(GL_TEXTURE_2D, intermediateTex1);
+
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB32F, bloomBufWidth, bloomBufHeight);
+    glActiveTexture(GL_TEXTURE2);
+
+    // glGenTextures(1, &tex2);                     // renamed in current context
+    // glDeleteTextures(1, &tex2);                  // deallocate
+    glGenTextures(1, &intermediateTex2);
+
+    // glBindTexture(GL_TEXTURE_2D, tex2);          // renamed in current context
+    glBindTexture(GL_TEXTURE_2D, intermediateTex2);
+
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB32F, bloomBufWidth, bloomBufHeight);
+
+    // Bind tex1 to the FBO
+    // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex1, 0);        // renamed in current context
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_2D, intermediateTex1, 0);
+
+    glDrawBuffers(1, drawBuffers);
+
+    ///// Bloom Effect with Gamma Correction (based on HDR) /////
+
+
 
     // Unbind the framebuffer, and revert to default framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-// lab 5.3
+// lab 5.4
 
 // this is self-made deallocator, it serve for one reason
 // to free the slots and save some memory (at least I hope it can)
@@ -610,10 +824,28 @@ void SceneBasic_Uniform::byeFBO()   // each glDelete... correspond to each glGen
     // glDeleteTextures(1, &hdrTex);        // in the lab it is called hdrTex
                                             // for my own study I will rename it as fboTex
     glDeleteTextures(1, &fboTex);
+
     glDeleteRenderbuffers(1, &depthBuf);
+
+    // glDeleteFramebuffers(1, &blurFbo);
+    glDeleteFramebuffers(1, &intermediateFBO);  // renamed in current context
+
+    // glDeleteTextures(1, &tex1);
+    glDeleteTextures(1, &intermediateTex1);     // renamed in current context
+
+    // glDeleteTextures(1, &tex2);
+    glDeleteTextures(1, &intermediateTex2);     // renamed in current context
 }
 
-void SceneBasic_Uniform::computeLogAveLuminance()
+// being called since initScene()
+float SceneBasic_Uniform::gauss(float x, float sigma2)  // from lab 5.2 gaussian blur
+{
+    double coeff = 1.0 / (glm::two_pi<double>() * sigma2);
+    double expon = -(x * x) / (2.0 * sigma2);
+    return (float)(coeff * exp(expon));
+}
+
+void SceneBasic_Uniform::computeLogAveLuminance()       // from lab 5.3 hdr with tone mapping
 {
     int size = width * height;
     std::vector<GLfloat> texData(size * 3);
@@ -637,4 +869,4 @@ void SceneBasic_Uniform::computeLogAveLuminance()
     prog.setUniform("AveLum", expf(sum / size));
 }
 
-// lab 5.3
+// lab 5.4
