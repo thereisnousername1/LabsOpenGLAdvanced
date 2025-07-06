@@ -77,7 +77,7 @@ private:
     //// Brief logic explanation ////
     */
 
-    float temp;     // declared as global for instant gauss calculate (perhaps)
+    // gaussian calculating logic and related variables are removed
 
     float tPrev;    // rotate again since lab 5.4
 

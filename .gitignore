@@ -397,3 +397,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/LabsOpenGLAdvanced/Lab 6.1 - point sprites/shader/basic_uniform.frag

@@ -38,12 +38,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
 {
     //                    relative file location in my computer            , bool center (according to the IDE)
     // mesh = ObjMesh::load("media/spot/spot_triangulated.obj");    // moved to initScene()
-
-    // for instant gauss calculate with sigma2 changeable (Key I -> ++, K -> --)
-    temp = Scene::sigma2;   // sigma2 is declared in scene.h
 }
-
-float weights[10], sum;  // declared as global for instant gauss calculate
 
 // init(), initialization of everything in a scene happen in here
 // Light intensity setting to be placed in here (Well actually that does not matter at all, so as all setting to be import to shader)
@@ -446,67 +441,6 @@ void SceneBasic_Uniform::pass2()    // Bright pass function
     glDrawArrays(GL_TRIANGLES, 0, 6);
     // glBindVertexArray(0);    // disabled since lab 5.2, it doesn't seems have any difference
 }
-
-/*
-void SceneBasic_Uniform::drawScene()
-{
-    vec3 intense = vec3(1.0f);
-
-    prog.setUniform("lights[0].Ld", intense);
-    prog.setUniform("lights[0].Ls", intense);
-    prog.setUniform("lights[1].Ld", intense);
-    prog.setUniform("lights[1].Ls", intense);
-    prog.setUniform("lights[2].Ld", intense);
-    prog.setUniform("lights[2].Ls", intense);
-
-    vec4 lightPos = vec4(0.0f, 4.0f, 2.5f, 1.0f);
-
-    lightPos.x = -7.0f;
-    prog.setUniform("lights[0].Position", view * lightPos);
-
-    lightPos.x = 0.0f;
-    prog.setUniform("lights[1].Position", view * lightPos);
-
-    lightPos.x = 7.0f;
-    prog.setUniform("lights[2].Position", view * lightPos);
-
-    prog.setUniform("Material.Kd", vec3(0.9f, 0.3f, 0.2f));
-    prog.setUniform("Material.Ks", vec3(1.0f, 1.0f, 1.0f));
-    prog.setUniform("Material.Ka", vec3(0.2f, 0.2f, 0.2f));
-    prog.setUniform("Material.shininess", 100.0f);
-
-    model = mat4(1.0f);
-
-    // The backdrop plane
-    model = glm::rotate(mat4(1.0f), glm::radians(90.0f), vec3(1.0f, 0.0f, 0.0f));
-    setMatrices();
-    plane.render();
-
-    // The bottom plane
-    model = glm::translate(mat4(1.0f), vec3(0.0f, -5.0f, 0.0f));
-    setMatrices();
-    plane.render();
-
-    // Top plane
-    model = glm::translate(mat4(1.0f), vec3(0.0f, 5.0f, 0.0f));
-    model = glm::rotate(model, glm::radians(180.0f), vec3(1.0f, 0.0f, 0.0f));
-    setMatrices();
-    plane.render();
-
-    // Sphere
-    prog.setUniform("Material.Kd", vec3(0.4f, 0.9f, 0.4f));
-    model = glm::translate(mat4(1.0f), vec3(-3.0f, -3.0f, 2.0f));
-    setMatrices();
-    sphere.render();
-
-    // Teapot
-    prog.setUniform("Material.Kd", vec3(0.4f, 0.4f, 0.9f));
-    model = glm::translate(mat4(1.0f), vec3(3.0f, -5.0f, 1.5f));
-    model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
-    setMatrices();
-    teapot.render();
-}
-*/
 
 #pragma endregion
 

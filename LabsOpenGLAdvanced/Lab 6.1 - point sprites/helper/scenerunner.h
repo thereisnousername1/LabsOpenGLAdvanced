@@ -152,27 +152,6 @@ private:
 			int state = glfwGetKey(window, GLFW_KEY_SPACE);
 			if (state == GLFW_PRESS)
 				scene.animate(!scene.animating());
-
-            // added for lab 5.2 & 5.4 only
-            Input(window, &scene.Gamma);
-        }
-    }
-
-    // input logic added for lab 5.2 to adjust gaussian value sigma2
-    void Input(GLFWwindow* WindowIn, float* num)
-    {
-        if (glfwGetKey(WindowIn, GLFW_KEY_O) == GLFW_PRESS)
-        {
-            // std::cout << "Hello" << std::endl;
-            *num += 0.1f;
-            std::cout << "New gamma value: " << *num << std::endl;
-        }
-
-        if (glfwGetKey(WindowIn, GLFW_KEY_L) == GLFW_PRESS)
-        {
-            // std::cout << "Hello" << std::endl;
-            *num -= 0.1f;
-            std::cout << "New gamma value: " << *num << std::endl;
         }
     }
 };

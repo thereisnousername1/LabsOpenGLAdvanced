@@ -113,41 +113,6 @@ void SceneBasic_Uniform::initScene()
     #pragma endregion
 
     setupFBO();
-
-    #pragma region (Disabled) Texture files linking
-    
-    /* Disabled since lab 5.1
-    // reference : https://www.reddit.com/r/opengl/comments/1f1wizb/how_bad_is_it_to_only_use_gl_texture0_and_what_is/
-    //             https://stackoverflow.com/questions/8866904/differences-and-relationship-between-glactivetexture-and-glbindtexture
-    //             https://community.khronos.org/t/when-to-use-glactivetexture/64913/2
-
-    // Order 1 :
-    // Load the texture into program, in lab 4.8 it refer to the texture for Mesh mesh
-    // GLuint texID = Texture::loadTexture("media/texture/brick1.jpg");
-    GLuint texID = Texture::loadTexture("media/spot/spot_texture.png");   // different options from the lab materials
-
-    // Order 1.1
-    mesh = ObjMesh::load("media/spot/spot_triangulated.obj");
-
-    setupFBO();
-    
-    // glActiveTexture(GL_TEXTURE0 + 1);    // this is used in lab solution
-    // Order 2 :
-    // pickup a texture unit that will keep affecting the whole program for to bind a texture to it
-    glActiveTexture(GL_TEXTURE0 + 1);
-    // glActiveTexture(GL_TEXTURE0);   // not really necessary, OpenGL can still bind without active anything
-                                       // that brought GL_TEXTURE0 texture unit (by default)
-
-    // assume the system somehow know it will send the texture binded in this texture unit 0
-    // to somewhere in whatever shader with the "binding = 0"  in vertex
-    // and then just forget it, it's meant to be written in this way
-
-    // Order 3 :
-    // the type of obj you want to declare as, obj to be bind
-    glBindTexture(GL_TEXTURE_2D, texID);
-    */
-
-    #pragma endregion
     
     // lab 5.1
 }

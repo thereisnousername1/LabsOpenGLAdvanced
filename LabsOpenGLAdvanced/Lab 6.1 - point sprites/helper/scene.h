@@ -22,8 +22,6 @@ public:
     int width;
     int height;
 
-    float Gamma = 2.2f;     // refer to lab sheet 5 p.43, it has no further description to the gamma correction at all
-
     // by default 800 and 600 will be the value once every scene object is created and constructor is executed
 	Scene() : m_animate(true), width(800), height(600) { }
 	virtual ~Scene() {}
