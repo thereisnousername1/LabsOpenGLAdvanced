@@ -159,7 +159,7 @@ vec3 phongModel (vec3 pos, vec3 norm, vec3 diffColor)  // diffColor is introduce
         specular = Light.Ls * Material.Ks * pow(max(dot(r, v), 0.0), Material.shininess);              // reflection -> Phong Shading
         // specular = lights[light].Ls * Material.Ks * pow(max(dot(r, v), 0.0), Material.shininess);   // specialized multiple lights formula
 
-        // specular = Light.Ls * Material.Ks * pow(max(dot(h, n), 0.0), Material.shininess);            // calculate the half vector -> Blinn-Phong Shading
+        // specular = Light.Ls * Material.Ks * pow(max(dot(h, norm), 0.0), Material.shininess);            // calculate the half vector -> Blinn-Phong Shading
         // specular = lights[light].Ls * Material.Ks * pow(max(dot(h, n), 0.0), Material.shininess);   // specialized multiple lights formula
 
         // mixed texColor with other factor
@@ -240,8 +240,9 @@ void pass2()    // Read from the g-buffer, evaluate the reflection model & produ
     vec3 norm = vec3( texture( NormalTex, TexCoord ) );
     vec3 diffColor = vec3( texture( ColorTex, TexCoord ) );
 
-    // in the lab sheet 5 it mentioned the model can switch between diffuseModel and phongModel, I don't know how
-    FragColor = vec4(pow(vec3(diffuseModel( pos, norm, diffColor )), vec3( 1.0/Gamma )), 1.0 );
+    // in the lab sheet 5 it mentioned the model can switch between diffuseModel and phongModel
+    // FragColor = vec4(pow(vec3(diffuseModel( pos, norm, diffColor )), vec3( 1.0/Gamma )), 1.0 );
+    FragColor = vec4(pow(vec3(phongModel( pos, norm, diffColor )), vec3( 1.0/Gamma )), 1.0 );
 }
 
 // lab 5.5

@@ -297,6 +297,8 @@ void SceneBasic_Uniform::pass1()    // Render pass function
     prog.setUniform("Light.Ld", intense);
     prog.setUniform("Light.Ls", intense);
 
+    prog.setUniform("Material.shininess", 100.0f);  // shininess needs to be set in phongModel usage
+
     prog.setUniform("Light.Position", glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
     prog.setUniform("Material.Kd", 0.9f, 0.9f, 0.9f);
     model = mat4(1.0f);
