@@ -74,6 +74,14 @@ void SceneBasic_Uniform::initScene()
     // Set the number of vertices per patch.    IMPORTANT!!
     glPatchParameteri(GL_PATCH_VERTICES, 4);
 
+    // lab 6.4
+
+    angle = glm::pi<float>() / 2.0f;
+
+    #pragma region (Light related) Light (diffuse, ambient, specular) intensity setting
+
+    ///////////// Uniforms ////////////////////
+
     // Segments and strips may be inverted on NVIDIA
     prog.use();
     prog.setUniform("NumSegments", 50);
@@ -82,18 +90,6 @@ void SceneBasic_Uniform::initScene()
 
     solidProg.use();
     solidProg.setUniform("Color", vec4(0.5f, 1.0f, 1.0f, 1.0f));
-
-    // lab 6.4
-
-    angle = glm::pi<float>() / 2.0f;
-
-    #pragma region (Disabled)(Light related) Light (diffuse, ambient, specular) intensity setting
-
-    ///////////// Uniforms ////////////////////
-    // prog.setUniform("Line.Width", 0.75f);   // lab 6.2
-
-    //prog.setUniform("EdegWidth", 0.015f);   // lab 6.3
-    //prog.setUniform("PctExtend", 0.25f);   // lab 6.3
 
     //prog.setUniform("Line.Color", vec4(0.05f, 0.0f, 0.05f, 1.0f));
 

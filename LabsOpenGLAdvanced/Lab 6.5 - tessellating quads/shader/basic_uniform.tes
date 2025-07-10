@@ -1,0 +1,47 @@
+#version 460
+
+layout( quads, equal_spacing, ccw ) in;
+
+uniform mat4 MVP;
+
+void main()
+{
+	float u = gl_TessCoord.x;
+	float v = gl_TessCoord.y;
+
+	vec4 p00 = gl_in[0].gl_Position;
+	vec4 p10 = gl_in[1].gl_Position;
+	vec4 p11 = gl_in[2].gl_Position;
+	vec4 p01 = gl_in[3].gl_Position;
+
+	// Linear interpolation
+	gl_Position = p00*(1.0-u) * (1.0-v) +
+				  p10 * u * (1.0-v) +
+				  p01 * v * (1.0-u) +
+				  p11 * u * v;
+
+	// Transform to clip coordinates
+	gl_Position = MVP * gl_Position;
+}
+
+/*
+Tessellation Evaluation Shader (TES)
+
+// Layout Input Parameters
+
+There are 3 required layout into parameters: 
+	The ．quads・ parameter that indicates that the tessellation-primitive generator should tessellate the parameter space using quad tessellation, 
+	the ．equal_spacing・ parameter that indicates that the tessellation should be performed such that all subdivisions have equal length & 
+	the ．ccw・ parameter that indicates that the primitives should be generated with counter clockwise winding.
+
+// Coordinate & Position Retrieval
+
+The main function in the TES starts by retrieving the parametric coordinates for this vertex by accessing the ．gl_TessCoord・ variable. 
+Then we move on to read the positions of the four vertices in the patch from the ．gl_in・ array. 
+We store them in temporary variables to be used in the interpolation calculation.
+
+// Interpolation & Output
+
+The built-in ．gl_Position・ output variable then gets the value of the interpolated point using the preceding equation. 
+Finally, we convert the position into clip coordinates by multiplying by the model-view-projection matrix.
+*/

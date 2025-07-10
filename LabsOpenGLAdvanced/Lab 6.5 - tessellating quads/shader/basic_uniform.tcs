@@ -1,0 +1,27 @@
+#version 460
+
+layout( vertices = 4 ) out;
+
+uniform int Outer;
+uniform int Inner;
+
+void main()
+{
+	// Pass along the vertex position unmodified
+	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+
+	gl_TessLevelOuter[0] = float(Outer);
+	gl_TessLevelOuter[1] = float(Outer);
+	gl_TessLevelOuter[2] = float(Outer);
+	gl_TessLevelOuter[3] = float(Outer);
+
+	gl_TessLevelInner[0] = float(Inner);
+	gl_TessLevelInner[1] = float(Inner);
+}
+
+/*
+Tessellation Control Shader (TCS)
+
+In the main function, the TCS passes the position of the vertex without modification & sets the inner & outer tessellation levels. 
+All four of the outer tessellation levels are set to the value of ．Outer・ & both of the inner tessellation levels are set to ．Inner・.
+*/

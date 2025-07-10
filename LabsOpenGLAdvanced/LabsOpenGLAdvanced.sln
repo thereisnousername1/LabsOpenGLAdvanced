@@ -61,6 +61,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 6.3 - Silhouette Lines"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 6.4 - Bezier Curve Tessellation", "Lab 6.4 - bezier curve tessellation\Lab 6.4 - bezier curve tessellation.vcxproj", "{20160D83-7055-4E63-8362-0D7C39F99962}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 6.5 - Tessellating Quads", "Lab 6.5 - tessellating quads\Lab 6.5 - tessellating quads.vcxproj", "{7BB2E78C-077E-40B0-8095-8DF24582D00C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -301,6 +303,14 @@ Global
 		{20160D83-7055-4E63-8362-0D7C39F99962}.Release|x64.Build.0 = Release|x64
 		{20160D83-7055-4E63-8362-0D7C39F99962}.Release|x86.ActiveCfg = Release|Win32
 		{20160D83-7055-4E63-8362-0D7C39F99962}.Release|x86.Build.0 = Release|Win32
+		{7BB2E78C-077E-40B0-8095-8DF24582D00C}.Debug|x64.ActiveCfg = Debug|x64
+		{7BB2E78C-077E-40B0-8095-8DF24582D00C}.Debug|x64.Build.0 = Debug|x64
+		{7BB2E78C-077E-40B0-8095-8DF24582D00C}.Debug|x86.ActiveCfg = Debug|Win32
+		{7BB2E78C-077E-40B0-8095-8DF24582D00C}.Debug|x86.Build.0 = Debug|Win32
+		{7BB2E78C-077E-40B0-8095-8DF24582D00C}.Release|x64.ActiveCfg = Release|x64
+		{7BB2E78C-077E-40B0-8095-8DF24582D00C}.Release|x64.Build.0 = Release|x64
+		{7BB2E78C-077E-40B0-8095-8DF24582D00C}.Release|x86.ActiveCfg = Release|Win32
+		{7BB2E78C-077E-40B0-8095-8DF24582D00C}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
