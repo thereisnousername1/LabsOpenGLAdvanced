@@ -217,5 +217,5 @@ void SceneBasic_Uniform::setMatrices()
 
     // prog.setUniform("ProjectionMatrix", projection); // send the projection matrix
 
-    prog.setUniform("ViewportMatrix", viewport);
+    prog.setUniform("ViewportMatrix", viewport);    // lab 6.2
 }

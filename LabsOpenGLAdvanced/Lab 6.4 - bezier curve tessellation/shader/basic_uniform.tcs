@@ -1,0 +1,52 @@
+#version 460
+
+layout( vertices = 4 ) out;
+
+uniform int NumSegments;
+uniform int NumStrips;
+
+void main()
+{
+	// Pass along the vertex position unmodified
+	gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+
+	// Some drivers (e.g. Intel) treat these levels incorrectly.
+	// The OpenGL spec says that level 0 should be the number of strips 
+	// and level 1 should be the number of segments per strip.
+	// Unfortunately, not all drivers do this.
+	// If this example doesn't work for you, try switching the right hand side of the 2 assignments below.
+
+	gl_TessLevelOuter[0] = float(NumStrips);
+	gl_TessLevelOuter[1] = float(NumSegments);
+}
+
+/*
+Tessellation Control Shader (TCS)
+ 
+// Inputs & Outputs
+ 
+The main method within the TCS passes the input position (of the patch vertex) to the output position without modification. 
+The ．gl_out・ and ．gl_in・ arrays contain the input and output information associated with each vertex in the patch.
+
+// GL Invocation Identifier
+
+Note that we assign & read from ．gl_InvocationID・ in the input & output arrays. 
+The ．gl_InvocationID・ variable defines the output patch vertex for which this invocation of the TCS is responsible.
+The TCS can access all of the elements of the ．gl_in・ array, however it should only write to the location in ．gl_out・ corresponding to ．gl_InvocationID・. 
+The other indices will be written by other invocations of the TCS.
+
+// Tessellation Levels
+
+Next, the TCS sets the tessellation levels by assigning to the ．gl_TessLevelOuter・ array. 
+Note that the values for ．gl_TessLevelOuter・ are floating point numbers rather than integers. 
+They will be rounded up to the nearest integer & clamped automatically by the OpenGL system.
+
+// Tessellation Array
+
+The first element in the array defines the number of isolines that will be generated. 
+Each isoline will have a constant value for ．v・. 
+Since we need to create a single curve, the value of ．gl_TessLevelOuter[0]・ should be one. 
+The second one defines the number of line segments that will be produced in the line strip. 
+Each vertex in the strip will have a value for the parametric ．u・ coordinate that will vary from zero to one. 
+See the lecture slides for an explanation on what the ．u・ coordinate is.
+*/

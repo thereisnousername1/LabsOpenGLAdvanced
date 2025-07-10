@@ -29,7 +29,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
 {
     //                    relative file location in my computer            , bool center (according to the IDE)
     // mesh = ObjMesh::load("media/bs_ears.obj");
-    mesh = ObjMesh::loadWithAdjacency("media/bs_ears.obj");    // lab 6.3
+    // mesh = ObjMesh::loadWithAdjacency("media/bs_ears.obj");    // disabled in lab 6.4
 }
 
 // init(), initialization of everything in a scene happen in here
@@ -42,37 +42,71 @@ void SceneBasic_Uniform::initScene()
 
     glEnable(GL_DEPTH_TEST);    // enable depth test
 
-    // lab 6.2
+    // lab 6.4
 
-    float c = 1.5f;
+    // float c = 1.5f;
+    float c = 3.5f;
 
     projection = glm::ortho(-0.4f * c, 0.4f * c, -0.3f * c, 0.3f * c, 0.1f, 100.0f); // orthographic view is used in lab 6.2
     // projection = mat4(1.0f);
 
-    // lab 6.2
+    glPointSize(10.0f);
+
+    // Set up patch VBO
+    float v[] = { -1.0f, -1.0f, -0.5f, 1.0f, 0.5f, -1.0f, 1.0f, 1.0f };
+
+    GLuint vboHandle;
+    glGenBuffers(1, &vboHandle);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
+    glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), v, GL_STATIC_DRAW);
+
+    // Set up patch VAO
+    glGenVertexArrays(1, &vaoHandle);
+    glBindVertexArray(vaoHandle);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vboHandle);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+
+    // Set the number of vertices per patch.    IMPORTANT!!
+    glPatchParameteri(GL_PATCH_VERTICES, 4);
+
+    // Segments and strips may be inverted on NVIDIA
+    prog.use();
+    prog.setUniform("NumSegments", 50);
+    prog.setUniform("NumStrips", 1);
+    prog.setUniform("LineColor", vec4(1.0f, 1.0f, 0.5f, 1.0f));
+
+    solidProg.use();
+    solidProg.setUniform("Color", vec4(0.5f, 1.0f, 1.0f, 1.0f));
+
+    // lab 6.4
 
     angle = glm::pi<float>() / 2.0f;
 
-    #pragma region (Light related) Light (diffuse, ambient, specular) intensity setting
+    #pragma region (Disabled)(Light related) Light (diffuse, ambient, specular) intensity setting
 
     ///////////// Uniforms ////////////////////
     // prog.setUniform("Line.Width", 0.75f);   // lab 6.2
 
-    prog.setUniform("EdegWidth", 0.015f);   // lab 6.3
-    prog.setUniform("PctExtend", 0.25f);   // lab 6.3
+    //prog.setUniform("EdegWidth", 0.015f);   // lab 6.3
+    //prog.setUniform("PctExtend", 0.25f);   // lab 6.3
 
-    prog.setUniform("Line.Color", vec4(0.05f, 0.0f, 0.05f, 1.0f));
+    //prog.setUniform("Line.Color", vec4(0.05f, 0.0f, 0.05f, 1.0f));
 
-    prog.setUniform("Material.Kd", 0.7f, 0.5f, 0.2f);
-    prog.setUniform("Material.Ka", 0.2f, 0.2f, 0.2f);
-    prog.setUniform("Material.Ks", 0.8f, 0.8f, 0.8f);
-    prog.setUniform("Material.shininess", 100.0f);
+    //prog.setUniform("Material.Kd", 0.7f, 0.5f, 0.2f);
+    //prog.setUniform("Material.Ka", 0.2f, 0.2f, 0.2f);
+    //prog.setUniform("Material.Ks", 0.8f, 0.8f, 0.8f);
+    //prog.setUniform("Material.shininess", 100.0f);
 
-    prog.setUniform("Light.Position", vec4(0.0f, 0.0f, 0.0f, 1.0f));
-    
-    prog.setUniform("Light.Ld", vec3(1.0f));
-    prog.setUniform("Light.La", vec3(0.05f));
-    prog.setUniform("Light.Ls", vec3(1.0f));
+    //prog.setUniform("Light.Position", vec4(0.0f, 0.0f, 0.0f, 1.0f));
+    //
+    //prog.setUniform("Light.Ld", vec3(1.0f));
+    //prog.setUniform("Light.La", vec3(0.05f));
+    //prog.setUniform("Light.Ls", vec3(1.0f));
 
     /*vec3 intense = vec3(0.6f);
 
@@ -106,11 +140,23 @@ void SceneBasic_Uniform::compile()
 {
     // compile mr prog with the desired shaders to be used in this scene
 	try {
+
+        // lab 6.4
+
 		prog.compileShader("shader/basic_uniform.vert");
 		prog.compileShader("shader/basic_uniform.frag");
-		prog.compileShader("shader/basic_uniform.gs");
+		// prog.compileShader("shader/basic_uniform.gs");   // disabled in lab 6.4
+		prog.compileShader("shader/basic_uniform.tes");
+		prog.compileShader("shader/basic_uniform.tcs");
 		prog.link();
 		prog.use();
+
+        solidProg.compileShader("shader/solid.vert");
+        solidProg.compileShader("shader/solid.frag");
+        solidProg.link();
+
+        // lab 6.4
+
 	} catch (GLSLProgramException &e) {
 		cerr << e.what() << endl;
 		exit(EXIT_FAILURE);
@@ -165,14 +211,25 @@ void SceneBasic_Uniform::render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we clear color and depth buffer
 
     // set up camera(it was done in mainly pass1() in previous lab 5, since everything is reset, it is now render() to set up camera)
-    // vec3 cameraPos(0.0f, 0.0f, 3.0f);
-    vec3 cameraPos(2.0f * sin(angle), 0.0f, 2.0f * cos(angle));   // spinning logic applied
+    vec3 cameraPos(0.0f, 0.0f, 3.0f);
+    // vec3 cameraPos(2.0f * sin(angle), 0.0f, 2.0f * cos(angle));   // spinning logic applied
     view = glm::lookAt(cameraPos, vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
 
     model = mat4(1.0f);
+
+    glBindVertexArray(vaoHandle);
+
     setMatrices();  //set up your matrices and send to shaders
 
-    mesh->render();
+    // Draw the curve
+    prog.use();
+    glDrawArrays(GL_PATCHES, 0, 4);
+
+    // Draw the control points
+    solidProg.use();
+    glDrawArrays(GL_POINTS, 0, 4);
+
+    // mesh->render();  // disabled in lab 6.4
 
     glFinish();
 }
@@ -210,12 +267,14 @@ void SceneBasic_Uniform::setMatrices()
 {
     mv = view * model; // model view matrix
 
+    prog.use(); // lab 6.4
+
     // besides of setUniform, there are also setMat4, and etc. (From COMP3016)
     // set the ModelViewMatrix uniform to mv
-    prog.setUniform("ModelViewMatrix", mv);
+    // prog.setUniform("ModelViewMatrix", mv);  // disabled in lab 6.4
 
     // set the NormalMatrix uniform to following structure
-    prog.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
+    // prog.setUniform("NormalMatrix", glm::mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));   // disabled in lab 6.4
 
     // set uniform for model, view, projection (MVP) and pass in the projection matrix * model view matrix
     prog.setUniform("MVP", projection * mv);
@@ -223,4 +282,8 @@ void SceneBasic_Uniform::setMatrices()
     // prog.setUniform("ProjectionMatrix", projection); // send the projection matrix
 
     // prog.setUniform("ViewportMatrix", viewport); // disabled in lab 6.3
+
+    solidProg.use();    // lab 6.4
+
+    solidProg.setUniform("MVP", projection * mv);   // lab 6.4
 }
