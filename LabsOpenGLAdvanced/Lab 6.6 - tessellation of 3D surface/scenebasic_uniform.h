@@ -12,7 +12,7 @@
 #include "helper/objmesh.h"
 #include "helper/cube.h"
 #include "helper/sphere.h"
-#include "teapotpatch.h"
+#include "helper/teapotpatch.h"
 
 // SceneBasic_Uniform is a subclass of the Scene class
 class SceneBasic_Uniform : public Scene

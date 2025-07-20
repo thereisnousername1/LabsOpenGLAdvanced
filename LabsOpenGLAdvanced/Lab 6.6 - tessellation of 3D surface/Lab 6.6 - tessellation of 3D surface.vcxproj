@@ -35,12 +35,12 @@
     <ClInclude Include="helper\stb\stb_image_write.h" />
     <ClInclude Include="helper\teapot.h" />
     <ClInclude Include="helper\teapotdata.h" />
+    <ClInclude Include="helper\teapotpatch.h" />
     <ClInclude Include="helper\texture.h" />
     <ClInclude Include="helper\torus.h" />
     <ClInclude Include="helper\trianglemesh.h" />
     <ClInclude Include="helper\utils.h" />
     <ClInclude Include="scenebasic_uniform.h" />
-    <ClInclude Include="teapotpatch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
@@ -53,12 +53,12 @@
     <ClCompile Include="helper\sphere.cpp" />
     <ClCompile Include="helper\stb\stb_image.cpp" />
     <ClCompile Include="helper\teapot.cpp" />
+    <ClCompile Include="helper\teapotpatch.cpp" />
     <ClCompile Include="helper\texture.cpp" />
     <ClCompile Include="helper\torus.cpp" />
     <ClCompile Include="helper\trianglemesh.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="scenebasic_uniform.cpp" />
-    <ClCompile Include="teapotpatch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\basic_uniform.frag" />

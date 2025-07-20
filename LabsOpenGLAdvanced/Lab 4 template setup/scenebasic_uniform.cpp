@@ -86,13 +86,22 @@ void SceneBasic_Uniform::compile()
 void SceneBasic_Uniform::update( float t )
 {
 
-    #pragma region lab 3.4 spinning logic
+    #pragma region Spinning logic
     
     float deltaT = t - tPrev;
-    if (tPrev == 0.0f) deltaT = 0.0f;
+
+    if (tPrev == 0.0f)
+        deltaT = 0.0f;
+
     tPrev = t;
-    angle += 0.1f * deltaT;
-    if (angle > glm::two_pi<float>()) angle -= glm::two_pi<float>();
+
+    if (m_animate)
+    {
+        angle += 0.1f * deltaT;
+
+        if (angle > glm::two_pi<float>())
+            angle -= glm::two_pi<float>();
+    }
 
     #pragma endregion
 

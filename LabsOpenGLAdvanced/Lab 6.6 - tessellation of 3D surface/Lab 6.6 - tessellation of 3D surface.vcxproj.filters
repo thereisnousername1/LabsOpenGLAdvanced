@@ -87,7 +87,7 @@
     <ClInclude Include="helper\sphere.h">
       <Filter>helper</Filter>
     </ClInclude>
-    <ClInclude Include="teapotpatch.h">
+    <ClInclude Include="helper\teapotpatch.h">
       <Filter>helper</Filter>
     </ClInclude>
   </ItemGroup>
@@ -137,7 +137,7 @@
     <ClCompile Include="helper\sphere.cpp">
       <Filter>helper</Filter>
     </ClCompile>
-    <ClCompile Include="teapotpatch.cpp">
+    <ClCompile Include="helper\teapotpatch.cpp">
       <Filter>helper</Filter>
     </ClCompile>
   </ItemGroup>

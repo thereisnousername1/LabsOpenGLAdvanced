@@ -24,7 +24,7 @@ private:
 
     GLSLProgram prog;
 
-    float angle;    // rotate again since lab 5.4
+    // float angle;     // rotate no more since lab 5.3
 
     glm::mat4 mv;
     
@@ -39,7 +39,7 @@ private:
 
     // Cube cube;
 
-    float rotSpeed; // rotate again since lab 5.4
+    // float rotSpeed;  // rotate no more since lab 5.3
 
     // renamed to match the naming style from prvious labs
     GLuint fsQuad, fboHandle, fboTex;           // basics requires for image processing (setupFBO())
@@ -68,7 +68,7 @@ private:
 
     float temp;     // declared as global for instant gauss calculate (perhaps)
 
-    float tPrev;    // rotate again since lab 5.4
+    // float tPrev;     // rotate no more since lab 5.3
 
     void setMatrices();
 

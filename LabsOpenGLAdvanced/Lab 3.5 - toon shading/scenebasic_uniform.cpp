@@ -312,7 +312,7 @@ void SceneBasic_Uniform::compile()
 // it seems float t can be used as a time factor, restriction to the program lifespan
 void SceneBasic_Uniform::update( float t )
 {
-    #pragma region Disabled in lab 2
+    #pragma region Spinning logic
     /*
 	//update your angle here
 
@@ -330,18 +330,26 @@ void SceneBasic_Uniform::update( float t )
 
     // lab 1
     */
-    #pragma endregion
 
     // lab 3.4 spinning logic
-    
+
     float deltaT = t - tPrev;
-    if (tPrev == 0.0f) deltaT = 0.0f;
+
+    if (tPrev == 0.0f)
+        deltaT = 0.0f;
+
     tPrev = t;
-    angle += 0.25f * deltaT;
-    if (angle > glm::two_pi<float>()) angle -= glm::two_pi<float>();
+
+    if (m_animate)
+    {
+        angle += 0.25f * deltaT;
+
+        if (angle > glm::two_pi<float>())
+            angle -= glm::two_pi<float>();
+    }
 
     // lab 3.4
-
+    #pragma endregion
 }
 
 // this function stored model / mesh / object declared and awaits to be rendered in scene

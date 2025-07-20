@@ -12,7 +12,7 @@
 #include "helper/objmesh.h"
 #include "helper/cube.h"
 #include "helper/sphere.h"
-#include "teapotpatch.h"
+#include "helper/teapotpatch.h"
 
 // SceneBasic_Uniform is a subclass of the Scene class
 class SceneBasic_Uniform : public Scene
@@ -45,7 +45,7 @@ private:
 
     float time;
 
-    // float rotSpeed; // rotation logic related
+    float rotSpeed; // rotation logic related
 
     // glm::mat4 viewport;  // disabled in lab 7.1
     //GLuint sprites; // it represents vaoHandle(former fboHandle in many previous labs) in upcoming labs in lab 6

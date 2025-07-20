@@ -138,24 +138,24 @@ void SceneBasic_Uniform::update( float t )
     
     float deltaT = t - tPrev;
 
-    if (tPrev == 0.0f) deltaT = 0.0f;
+    if (tPrev == 0.0f)
+        deltaT = 0.0f;
     tPrev = t;
-    // angle += 0.1f * deltaT;  // changed since lab 4.5
-    angle += rotSpeed * deltaT;
 
-    // lab 4.5
-    if (angle > glm::two_pi<float>()) angle -= glm::two_pi<float>();
+    // lab 4.3
 
-    /* lab 4.3
-    if (this->m_animate)
+    if (m_animate)
     {
+        // angle += 0.1f * deltaT;  // the logic is piece of shit in the video, rearranged for better spinning logic
+
         // it is just modifing the variable angle more rapidly
         angle += rotSpeed * deltaT;
 
-        if (angle > glm::two_pi<float>()) angle -= glm::two_pi<float>();
+        if (angle > glm::two_pi<float>())
+            angle -= glm::two_pi<float>();
     }
 
-    */
+    // lab 4.3
 
     #pragma endregion
 

@@ -24,7 +24,7 @@ private:
 
     GLSLProgram prog;
 
-    float angle;    // rotate again since lab 5.4
+    float angle;    // rotate again since lab 5.5
 
     glm::mat4 mv;
     
@@ -39,7 +39,7 @@ private:
 
     // Cube cube;
 
-    float rotSpeed; // rotate again since lab 5.4
+    float rotSpeed; // rotate again since lab 5.5
 
     /// from lab 5.5 deferred shading the image processing things is kind of completed
     /// starting from this lab the GLuint will be modified to match the name as shown in the video
@@ -79,7 +79,7 @@ private:
 
     // gaussian calculating logic and related variables are removed
 
-    float tPrev;    // rotate again since lab 5.4
+    float tPrev;    // rotate again since lab 5.5
 
     void setMatrices();
 

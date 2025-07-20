@@ -1,6 +1,6 @@
 #include "teapotpatch.h"
-#include "helper/teapotdata.h"
-#include "helper/glutils.h"
+#include "teapotdata.h"
+#include "glutils.h"
 
 #include <glad/glad.h>
 

@@ -28,7 +28,7 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     tPrev(0), 
     angle(0.0f), 
     time(0.0f), // lab 7.1
-    // rotSpeed(glm::pi<float>() / 8.0f)
+    rotSpeed(glm::pi<float>() / 8.0f),
     plane(13.0, 10.0f, 200, 2)  // lab 7.1
 {
     //                    relative file location in my computer            , bool center (according to the IDE)
@@ -155,28 +155,24 @@ void SceneBasic_Uniform::compile()
 // it seems float t can be used as a time factor, restriction to the program lifespan
 void SceneBasic_Uniform::update( float t )
 {
-    time = t;
+    time = t;   // added since lab 7.1
 
-    #pragma region (Disabled)spinning logic
-    
-    /* disabled since lab 7.1
+    #pragma region Spinning logic
+
     float deltaT = t - tPrev;
-    if (tPrev == 0.0f) deltaT = 0.0f;
+
+    if (tPrev == 0.0f)
+        deltaT = 0.0f;
     tPrev = t;
-    angle += 0.1f * deltaT; // this is modified in lab video, angle += rotSpeed * deltaT;
 
-    // lab 4.3
-
-    // if (angle > glm::two_pi<float>()) angle -= glm::two_pi<float>();
-    if (this->m_animate)
+    if (m_animate)
     {
         // it is just modifing the variable angle more rapidly
         angle += rotSpeed * deltaT;
 
-        if (angle > glm::two_pi<float>()) angle -= glm::two_pi<float>();
+        if (angle > glm::two_pi<float>())
+            angle -= glm::two_pi<float>();
     }
-
-    */
 
     #pragma endregion
 }

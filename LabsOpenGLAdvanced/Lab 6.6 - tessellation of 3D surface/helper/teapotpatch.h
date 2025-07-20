@@ -1,6 +1,6 @@
 #pragma once
 
-#include "helper/trianglemesh.h"
+#include "trianglemesh.h"
 #include <glm/glm.hpp>
 
 class TeapotPatch : public TriangleMesh
