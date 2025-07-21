@@ -69,6 +69,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 7.1 - Surface Animation
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 7.2 - Particle Fountain", "Lab 7.2 - particle fountain\Lab 7.2 - particle fountain.vcxproj", "{FA9D7B21-F862-4CE7-873B-4413963AE679}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 7.3 - Particle Fountain with Transform Feedback", "Lab 7.3 - particle fountain with transform feedback\Lab 7.3 - particle fountain with transform feedback.vcxproj", "{6A68C9D5-784B-4112-975C-7F3BB65AB4D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -341,6 +343,14 @@ Global
 		{FA9D7B21-F862-4CE7-873B-4413963AE679}.Release|x64.Build.0 = Release|x64
 		{FA9D7B21-F862-4CE7-873B-4413963AE679}.Release|x86.ActiveCfg = Release|Win32
 		{FA9D7B21-F862-4CE7-873B-4413963AE679}.Release|x86.Build.0 = Release|Win32
+		{6A68C9D5-784B-4112-975C-7F3BB65AB4D7}.Debug|x64.ActiveCfg = Debug|x64
+		{6A68C9D5-784B-4112-975C-7F3BB65AB4D7}.Debug|x64.Build.0 = Debug|x64
+		{6A68C9D5-784B-4112-975C-7F3BB65AB4D7}.Debug|x86.ActiveCfg = Debug|Win32
+		{6A68C9D5-784B-4112-975C-7F3BB65AB4D7}.Debug|x86.Build.0 = Debug|Win32
+		{6A68C9D5-784B-4112-975C-7F3BB65AB4D7}.Release|x64.ActiveCfg = Release|x64
+		{6A68C9D5-784B-4112-975C-7F3BB65AB4D7}.Release|x64.Build.0 = Release|x64
+		{6A68C9D5-784B-4112-975C-7F3BB65AB4D7}.Release|x86.ActiveCfg = Release|Win32
+		{6A68C9D5-784B-4112-975C-7F3BB65AB4D7}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
