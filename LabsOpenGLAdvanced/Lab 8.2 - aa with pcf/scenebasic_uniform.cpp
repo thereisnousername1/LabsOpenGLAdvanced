@@ -30,12 +30,12 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
     tPrev(0),
     rotSpeed(0.2f),
     shadowMapWidth(512), shadowMapHeight(512),
-    teapot(14, glm::mat4(1.0f)),
-    plane(40.0f, 40.0f, 2, 2),
-    torus(0.7f * 2.0f, 0.3f * 2.0f, 50, 50)
+    // teapot(14, glm::mat4(1.0f)),             // disabled since lab 8.2
+    plane(40.0f, 40.0f, 2, 2)
+    // torus(0.7f * 2.0f, 0.3f * 2.0f, 50, 50)  // disabled since lab 8.2
 {
     //                       relative file location in my computer            , bool center (according to the IDE)
-    // mesh = ObjMesh::load("../Lab 3.3 - pig mesh/media/pig_triangulated.obj", true);
+    mesh = ObjMesh::load("media/building.obj");   // enabled since lab 8.2 for the building model
 }
 
 // init(), initialization of everything in a scene happen in here
@@ -198,9 +198,12 @@ void SceneBasic_Uniform::render()
     //spitOutDepthBuffer(); // this is just used to get an image of the depth buffer
 
     // Pass 2 (render)
-    float c = 2.0f;
-    vec3 cameraPos(c * 11.5f * cos(angle), c * 7.0f, c * 11.5f * sin(angle));
-    view = glm::lookAt(cameraPos, vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
+    // float c = 2.0f;                                                              // disabled since lab 8.2
+    float c = 1.5f;                                                                     // lab 8.2
+    // vec3 cameraPos(c * 11.5f * cos(angle), c * 7.0f, c * 11.5f * sin(angle));    // disabled since lab 8.2
+    vec3 cameraPos(c * cos(angle), c, c * sin(angle));                                  // lab 8.2
+    // view = glm::lookAt(cameraPos, vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));           // disabled since lab 8.2
+    view = glm::lookAt(cameraPos, vec3(0.0f, -0.175f, 0.0f), vec3(0.0f, 1.0f, 0.0f));   // lab 8.2
 
     prog.setUniform( "Light.Position", view * vec4(lightFrustum.getOrigin(), 1.0f) );
 
@@ -226,6 +229,8 @@ void SceneBasic_Uniform::render()
 void SceneBasic_Uniform::drawScene()
 {
     vec3 color = vec3(0.2f, 0.5f, 0.9f);
+    
+    /* since lab 8.2 we are using building model instead
     prog.setUniform("Material.Kd", color);
     prog.setUniform("Material.Ka", color * 0.05f);
     prog.setUniform("Material.Ks", vec3(0.9f, 0.9f, 0.9f));
@@ -244,6 +249,11 @@ void SceneBasic_Uniform::drawScene()
     model = glm::rotate(model, glm::radians(-45.0f), vec3(1.0f, 0.0f, 0.0f));
     setMatrices();
     torus.render();
+    */
+
+    model = mat4(1.0f);
+    setMatrices();
+    mesh->render();
 
     prog.setUniform("Material.Kd", vec3(0.25f, 0.25f, 0.25f));
     prog.setUniform("Material.Ka", vec3(0.05f, 0.05f, 0.05f));
@@ -312,8 +322,11 @@ void SceneBasic_Uniform::setupFBO()
     glBindTexture(GL_TEXTURE_2D, depthTex);
     glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT24, shadowMapWidth, shadowMapHeight);
 
+    /*  lab 8.1
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);*/
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border);
