@@ -81,6 +81,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 8.1 - Shadow Map", "Lab
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 8.2 - AA with PCF", "Lab 8.2 - aa with pcf\Lab 8.2 - aa with pcf.vcxproj", "{8FB454EF-0326-4C25-BE85-93456D8AF873}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 8.3 - Shadow Map with Soft edges", "Lab 8.3 - shadow map with soft edges\Lab 8.3 - shadow map with soft edges.vcxproj", "{0EB95C40-5B7B-4636-9047-2BC06959AAFD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -401,6 +403,14 @@ Global
 		{8FB454EF-0326-4C25-BE85-93456D8AF873}.Release|x64.Build.0 = Release|x64
 		{8FB454EF-0326-4C25-BE85-93456D8AF873}.Release|x86.ActiveCfg = Release|Win32
 		{8FB454EF-0326-4C25-BE85-93456D8AF873}.Release|x86.Build.0 = Release|Win32
+		{0EB95C40-5B7B-4636-9047-2BC06959AAFD}.Debug|x64.ActiveCfg = Debug|x64
+		{0EB95C40-5B7B-4636-9047-2BC06959AAFD}.Debug|x64.Build.0 = Debug|x64
+		{0EB95C40-5B7B-4636-9047-2BC06959AAFD}.Debug|x86.ActiveCfg = Debug|Win32
+		{0EB95C40-5B7B-4636-9047-2BC06959AAFD}.Debug|x86.Build.0 = Debug|Win32
+		{0EB95C40-5B7B-4636-9047-2BC06959AAFD}.Release|x64.ActiveCfg = Release|x64
+		{0EB95C40-5B7B-4636-9047-2BC06959AAFD}.Release|x64.Build.0 = Release|x64
+		{0EB95C40-5B7B-4636-9047-2BC06959AAFD}.Release|x86.ActiveCfg = Release|Win32
+		{0EB95C40-5B7B-4636-9047-2BC06959AAFD}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

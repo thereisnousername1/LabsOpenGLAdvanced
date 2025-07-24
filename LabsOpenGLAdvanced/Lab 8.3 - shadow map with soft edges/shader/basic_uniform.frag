@@ -16,6 +16,14 @@ in vec4 ShadowCoord;
 
 uniform sampler2DShadow ShadowMap;
 
+// lab 8.3
+
+uniform sampler3D OffsetTex;
+
+uniform float Radius;
+
+uniform vec3 OffsetTexSize; // (width, height, depth)
+
 // Final Output
 layout (location = 0) out vec4 FragColor;
 
@@ -153,19 +161,7 @@ void shadeWithShadow()
     vec3 ambient = Light.La * Material.Ka;
     vec3 diffAndSpec = phongModel(position, normalize(normal));
 
-    /* former lab 8.1 lines
-    if ( ShadowCoord.z >= 0 )
-    {
-        shadow = textureProj(ShadowMap, ShadowCoord);
-    }
-    */
-
-    // lab 8.2
-
-    // look up the texels nearby
-    float sum = 0;
-    float shadow = 1.0;
-    
+    /* former lab 8.2 lines
     // Don't text points behind the light source.
     if (ShadowCoord.z >= 0)
     {
@@ -176,8 +172,51 @@ void shadeWithShadow()
         sum += textureProjOffset(ShadowMap, ShadowCoord, ivec2(1, -1));
         shadow = sum * 0.25;
     }
+    */
+
+    // lab 8.3
+
+    // look up the texels nearby
+    float sum = 0;
+    float shadow = 1.0;
     
-    // lab 8.2
+    ivec3 offsetCoord;
+    offsetCoord.xy = ivec2( mod( gl_FragCoord.xy, OffsetTexSize.xy ) );
+    
+    int samplesDiv2 = int(OffsetTexSize.z);
+    vec4 sc = ShadowCoord;
+
+    // Don't test points behind the light source.
+    if( sc.z >= 0 ) {
+        for( int i = 0 ; i < 4; i++ )
+        {
+            offsetCoord.z = i;
+            vec4 offsets = texelFetch(OffsetTex, offsetCoord, 0) * Radius * ShadowCoord.w;
+
+            sc.xy = ShadowCoord.xy + offsets.xy;
+            sum += textureProj(ShadowMap, sc);
+            sc.xy = ShadowCoord.xy + offsets.zw;
+            sum += textureProj(ShadowMap, sc);
+        }
+        shadow = sum / 8.0;
+
+        if( shadow != 1.0 && shadow != 0.0 )
+        {
+            for ( int i = 4; i < samplesDiv2; i++ )
+            {
+                offsetCoord.z = i;
+                vec4 offsets = texelFetch(OffsetTex, offsetCoord, 0) * Radius * ShadowCoord.w;
+
+                sc.xy = ShadowCoord.xy + offsets.xy;
+                sum += textureProj(ShadowMap, sc);
+                sc.xy = ShadowCoord.xy + offsets.zw;
+                sum += textureProj(ShadowMap, sc);
+            }
+        shadow = sum / float(samplesDiv2 * 2.0);
+        }
+    }
+
+    // lab 8.3
 
     // if the fragment is in shadow, use ambient light only
     FragColor = vec4(diffAndSpec * shadow + ambient, 1.0);

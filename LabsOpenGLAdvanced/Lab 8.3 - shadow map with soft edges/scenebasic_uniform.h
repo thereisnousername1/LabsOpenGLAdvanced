@@ -14,6 +14,8 @@
 
 #include "helper/frustum.h" // lab 8.1
 
+#include "helper/random.h"  // lab 8.3
+
 // SceneBasic_Uniform is a subclass of the Scene class
 class SceneBasic_Uniform : public Scene
 {
@@ -27,15 +29,15 @@ private:
 
     float rotSpeed;
         
-    // std::unique_ptr<ObjMesh> mesh;
+    std::unique_ptr<ObjMesh> mesh;  // enabled since lab 8.2 for the building model
     
     GLSLProgram prog, solidProg;
 
     GLuint shadowFBO, pass1Index, pass2Index;
     
-    Teapot teapot;
+    // Teapot teapot;   // disabled since lab 8.2
     Plane plane;
-    Torus torus;
+    // Torus torus;     // disabled since lab 8.2
 
     int shadowMapWidth, shadowMapHeight;
     float tPrev;    // spinning logic related
@@ -43,6 +45,20 @@ private:
     glm::mat4 lightPV, shadowBias;
     
     Frustum lightFrustum;
+
+    // lab 8.3
+    
+    int samplesU, samplesV;
+    int jitterMapSize;
+    float radius;
+
+    glm::vec3 lightPos;
+
+    float jitter();
+
+    void buildJitterTex();
+
+    // lab 8.3
 
     void setMatrices();
     

@@ -50,7 +50,6 @@ private:
 
     void setupFBO();
     void drawScene();
-    void spitOutDepthBuffer();
 
 public:
     SceneBasic_Uniform();
