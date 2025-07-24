@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
 {
 	// initialization of the glfw, glad is done in SceneRunner
 	// in another word, SceneRunner is the window itself in this case
-	SceneRunner runner("Lab 8.3 - Shadow Map with Soft Edges");	// Title of the program
+	SceneRunner runner("Lab 8.4 - Shadow Volume");	// Title of the program
 
 	std::unique_ptr<Scene> scene;
 

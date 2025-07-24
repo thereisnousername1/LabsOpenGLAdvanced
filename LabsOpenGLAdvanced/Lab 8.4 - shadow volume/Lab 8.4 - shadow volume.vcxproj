@@ -60,17 +60,22 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="shader\basic_uniform.frag" />
+    <None Include="shader\basic_uniform.gs" />
     <None Include="shader\basic_uniform.vert" />
+    <None Include="shader\shadow_volume_comp.frag" />
+    <None Include="shader\shadow_volume_comp.vert" />
+    <None Include="shader\shadow_volume_render.frag" />
+    <None Include="shader\shadow_volume_render.vert" />
     <None Include="shader\solid.frag" />
     <None Include="shader\solid.vert" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{0EB95C40-5B7B-4636-9047-2BC06959AAFD}</ProjectGuid>
-    <RootNamespace>Lab 8.3 - Shadow Map with Soft Edges</RootNamespace>
+    <ProjectGuid>{2473A11D-32C6-44BA-B7F0-4A9BBDFCFC6C}</ProjectGuid>
+    <RootNamespace>Lab 8.4 - Shadow Volume</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Lab 8.3 - Shadow Map with Soft Edges</ProjectName>
+    <ProjectName>Lab 8.4 - Shadow Volume</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
