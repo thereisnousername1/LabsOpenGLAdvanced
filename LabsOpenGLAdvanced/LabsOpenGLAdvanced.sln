@@ -17,7 +17,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 3.1 - Per-vertex lighti
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 3.2 - Per-fragment lighting (Phong shading), Multiple Lights on Fragment Shader", "Lab 3.2 - multiple Lights on fragment shader\Lab 3.2 - multiple Lights on fragment shader.vcxproj", "{F19CEBCE-323D-4889-B914-848E3C0C0344}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 3.3 - pig mesh", "Lab 3.3 - pig mesh\Lab 3.3 - pig mesh.vcxproj", "{26E7A817-1607-40D4-8937-A28A1682D664}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 3.3 - Pig Mesh", "Lab 3.3 - pig mesh\Lab 3.3 - pig mesh.vcxproj", "{26E7A817-1607-40D4-8937-A28A1682D664}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 3.4 - Spotlight", "Lab 3.4 - spotlight\Lab 3.4 - spotlight.vcxproj", "{ABB866DB-E0DF-4D48-8395-866CA329B69F}"
 EndProject
@@ -86,6 +86,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 8.4 - Shadow Volume", "Lab 8.4 - shadow volume\Lab 8.4 - shadow volume.vcxproj", "{2473A11D-32C6-44BA-B7F0-4A9BBDFCFC6C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 9.1 - Cloud Effect", "Lab 9.1 - cloud effect\Lab 9.1 - cloud effect.vcxproj", "{7484314C-B01F-4FCE-B3C4-84EC1252C113}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lab 9.2 - Wood Grain Effect", "Lab 9.2 - wood grain effect\Lab 9.2 - wood grain effect.vcxproj", "{BFD544D0-2467-4255-A770-A51A793FFD59}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -431,6 +433,14 @@ Global
 		{7484314C-B01F-4FCE-B3C4-84EC1252C113}.Release|x64.Build.0 = Release|x64
 		{7484314C-B01F-4FCE-B3C4-84EC1252C113}.Release|x86.ActiveCfg = Release|Win32
 		{7484314C-B01F-4FCE-B3C4-84EC1252C113}.Release|x86.Build.0 = Release|Win32
+		{BFD544D0-2467-4255-A770-A51A793FFD59}.Debug|x64.ActiveCfg = Debug|x64
+		{BFD544D0-2467-4255-A770-A51A793FFD59}.Debug|x64.Build.0 = Debug|x64
+		{BFD544D0-2467-4255-A770-A51A793FFD59}.Debug|x86.ActiveCfg = Debug|Win32
+		{BFD544D0-2467-4255-A770-A51A793FFD59}.Debug|x86.Build.0 = Debug|Win32
+		{BFD544D0-2467-4255-A770-A51A793FFD59}.Release|x64.ActiveCfg = Release|x64
+		{BFD544D0-2467-4255-A770-A51A793FFD59}.Release|x64.Build.0 = Release|x64
+		{BFD544D0-2467-4255-A770-A51A793FFD59}.Release|x86.ActiveCfg = Release|Win32
+		{BFD544D0-2467-4255-A770-A51A793FFD59}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
