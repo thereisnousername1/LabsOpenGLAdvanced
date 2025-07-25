@@ -135,8 +135,8 @@ void SceneBasic_Uniform::initScene()
     // spotTex = Texture::loadTexture("media/spot/spot_texture.png");
     // brickTex = Texture::loadTexture("media/texture/brick1.jpg");
     
-    GLuint noiseTex = NoiseTex::generate2DTex(6.0f); // lab 9.1
-    // GLuint noiseTex = NoiseTex::generate2DTex();        // lab 9.2
+    // GLuint noiseTex = NoiseTex::generate2DTex(6.0f); // lab 9.1
+    GLuint noiseTex = NoiseTex::generate2DTex();        // lab 9.2
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, noiseTex);
 
