@@ -51,7 +51,7 @@ void SceneBasic_Uniform::initScene()
     angle = 0.0f;       // lab 8.4 setting
 
     // set up the framebuffer object
-    setupFBO();
+    // setupFBO();                  // moved to resize() for resizing logic
 
     renderProg.use();
     renderProg.setUniform("LightIntensity", vec3(1.0f));
@@ -391,12 +391,13 @@ void SceneBasic_Uniform::drawScene(GLSLProgram& prog, bool onlyShadowCasters)
 // unlikely to be edit very often
 void SceneBasic_Uniform::resize(int w, int h)
 {
-
     glViewport(0, 0, w, h);
 
     width = w;
     height = h;
 
+    setupFBO();
+    
     // setting the aspect ratio for the model according to the window size
     // without this line it will not render
     // projection = glm::perspective(glm::radians(70.0f), (float)w / h, 0.3f, 100.0f);
