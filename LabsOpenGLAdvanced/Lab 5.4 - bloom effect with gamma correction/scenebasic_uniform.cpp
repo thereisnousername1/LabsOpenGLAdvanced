@@ -26,9 +26,9 @@ SceneBasic_Uniform::SceneBasic_Uniform() :
 
     // lab 5.4
 
-    tPrev(0),                           // rotate again since lab 5.4
+    // tPrev(0),
     angle(0.0f),                        // rotate again since lab 5.4
-    rotSpeed(glm::pi<float>() / 8.0f),  // rotate again since lab 5.4
+    // rotSpeed(glm::pi<float>() / 8.0f),
     plane(20.0f, 50.0f, 1, 1),              // modified since lab 5.3
     teapot(14, mat4(1.0f)),
     // torus(0.7f * 1.5f, 0.3f * 1.5f, 50, 50)  // replaced with sphere since lab 5.3
@@ -63,9 +63,6 @@ void SceneBasic_Uniform::initScene()
     // view = glm::lookAt(vec3(1.0f, 1.25f, 1.25f), vec3(0.0f, -0.1f, 0.0f), vec3(0.0f, 1.0f, 0.0f));   // moved to render()
 
     projection = mat4(1.0f);
-
-    // angle = glm::pi<float>() / 4.0f; // rotate again since lab 5.4
-    angle = glm::pi<float>() / 2.0f;
 
     #pragma region Image Processing Techniques - Bloom Effect with Gamma Correction (based on HDR)
 

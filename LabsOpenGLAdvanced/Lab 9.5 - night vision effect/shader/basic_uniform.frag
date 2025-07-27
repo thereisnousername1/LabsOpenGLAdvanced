@@ -204,6 +204,7 @@ vec4 pass2()
     vec4 color = texture(RenderTex, TexCoord);
     float green = luminance( color.rgb );
 
+    // where the dist1 and dist2 will be rendered as black, it looks like looking through a binocular
     float dist1 = length( gl_FragCoord.xy - vec2(Width / 4.0, Height / 2.0) );
     float dist2 = length( gl_FragCoord.xy - vec2(3.0 * Width / 4.0, Height / 2.0) );
     

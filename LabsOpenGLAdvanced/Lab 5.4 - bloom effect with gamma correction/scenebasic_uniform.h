@@ -24,7 +24,7 @@ private:
 
     GLSLProgram prog;
 
-    // float angle;     // rotate no more since lab 5.3
+    float angle;
 
     glm::mat4 mv;
     
