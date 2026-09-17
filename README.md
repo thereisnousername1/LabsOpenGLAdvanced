@@ -57,18 +57,18 @@ Do the next steps (adding GLAD), GLFW needs Glad to run before it.
 
 GLAD 
 Next step is to add GLAD to our project. Generate GLAD dependencies for our system 
-1. Open the web browser tool and generate the dependencies. Make sure you pick C++ 
-and OpenGL 4.6 and make sure the profile is set to “Core”. Tick the option “Generate 
-a loader” 
-2. Unpack the folder and copy the content of the GLAD “include” folder and paste it into 
-C:/users/public/OpenGL/include. (The content of GLAD “include” should have 2 
-folders “glad” and “KHR”). 
-3. Add the “glad.c” file to your project. Copy the file in your project (put it in the same 
-folder where your main.cpp file is). As you can see, even though you copied the file 
-in the project folder it doesn’t show in the project. You need to add it to the project, 
-right click on the “Source Files” and add an existing item. Pick the glad.c file in the 
-project folder and add it to the Project. 
-Now you should see the file next to your main.cpp file. 
-Let’s test the project so far. Add the following line at the top of the main.cpp file. Make sure 
-you have the correct order. Glad needs to be before GLFW: 
+
+1. Open the web browser tool and generate the dependencies.
+   Make sure you pick C++ and OpenGL 4.6 and make sure the profile is set to “Core”.
+   Tick the option “Generate a loader” 
+2. Unpack the folder and copy the content of the GLAD “include” folder and paste it into C:/users/public/OpenGL/include.
+   (The content of GLAD “include” should have 2 folders “glad” and “KHR”). 
+3. Add the “glad.c” file to your project. Copy the file in your project (put it in the same folder where your main.cpp file is).
+   You also need to add it to the project manually, right click on the “Source Files” and add an existing item.
+   Pick the glad.c file in the project folder and add it to the Project.
+   
+Now you should see the file next to your main.cpp file. Let’s test the project so far. 
+Add the following line at the top of the main.cpp file. 
+Make sure you have the correct order. Importing GLAD needs to be done before GLFW
+
 If you’ve done everything ok. You shouldn’t get any errors when building the project. 
